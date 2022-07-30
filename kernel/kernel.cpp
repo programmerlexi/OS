@@ -208,8 +208,8 @@ void kernel_main() {
     uint8_t disk = *((uint8_t*)0x5004);
     print_string(HexToString(disk));
     //print_string("\n\r");
-    //terminal_init(); // Initialize the terminal
-    //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
+    terminal_init(); // Initialize the terminal
+    proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();
 }
 
