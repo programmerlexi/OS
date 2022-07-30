@@ -1,0 +1,1 @@
+char* USER = (char*)"kernel";
