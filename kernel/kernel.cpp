@@ -136,7 +136,7 @@ extern "C" {
 
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
-    //init_paging(); // Initialize paging
+    init_paging(); // Initialize paging
     init_gdt(); // Initialize the GDT
     init_heap(0x100000, 0x200000); // Initialize heap at 0x100000 with a size of 1MB
     init_vga(); // Initialize VGA

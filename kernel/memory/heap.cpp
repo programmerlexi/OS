@@ -93,6 +93,9 @@ void combine_free_segments(heap_segment_header* a, heap_segment_header* b) {
     if (a == NULL || b == NULL) {
         return;
     }
+    if (!a->free || !b->free) {
+        return;
+    }
     if (a < b) {
         a->size += b->size + sizeof(heap_segment_header);
         a->next = b->next;
@@ -118,7 +121,7 @@ void free(void* ptr) {
     } else {
         current = (heap_segment_header*)((uint64_t)ptr - sizeof(heap_segment_header));
     }*/
-    current = (heap_segment_header*)((uint64_t)ptr - sizeof(heap_segment_header));
+    current = (heap_segment_header*)(((uint64_t)ptr) - sizeof(heap_segment_header));
     current->free = true;
     if (current < first_free_segment) {
         first_free_segment = current;
@@ -144,6 +147,14 @@ void free(void* ptr) {
         if (current->prev->free) {
             combine_free_segments(current, current->prev);
         }
+    }
+}
+
+void combine_all_free_segments() {
+    heap_segment_header* next = first_free_segment;
+    while (next) {
+        combine_free_segments(next, next->next);
+        next = next->next;
     }
 }
 
