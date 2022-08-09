@@ -1,4 +1,4 @@
-
+#include "bki.cpp"
 #include "gatr/vga_text.cpp"
 //#include "gatr/vga_graphics.cpp"
 #include "utils/util.cpp"
