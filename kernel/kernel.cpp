@@ -125,7 +125,8 @@ void test_proc() {
 
 extern "C" {
     void test_user_function() {
-        print_string("Welcome to usermode!\n\r");
+        for (;;);
+        //print_string("Welcome to usermode!\n\r");
     }
 }
 
@@ -169,7 +170,6 @@ void kernel_init() {
     //reset_vga_pos(); // Reset the VGA cursor position
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
-    
     exit_debug_scope();
 }
 

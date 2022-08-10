@@ -2,6 +2,7 @@
 #include "services/proc.h"
 #include "services/keyboard.h"
 #include "shell/env.cpp"
+#include "shell/programs/proc_progs.cpp"
 
 void terminal_loop();
 
@@ -35,6 +36,7 @@ void load_programs() {
     build_program(clear,"clear","clears the screen");
     build_program(test,"test","tests the kernel");
     build_program(cpu_info,"cpuinfo","prints CPU information");
+    build_program(procs,"procs","prints the process list");
 }
 
 int sub_pid;

@@ -4,9 +4,9 @@
 #include "../gatr/vga.h"
 
 enum ProcState {
-    PROC_RUNNING,
-    PROC_READY,
     PROC_DEAD,
+    PROC_READY,
+    PROC_RUNNING,
     PROC_SLEEPING,
     PROC_WAITING
 };
