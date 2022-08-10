@@ -1,7 +1,7 @@
 #include "heap.h"
 #include "memory.h"
 
-heap_segment_header* first_free_segment;
+//heap_segment_header* first_free_segment;
 
 void init_heap(uint64_t heapAddress, size_t size) {
     first_free_segment = (heap_segment_header*)heapAddress;
@@ -11,6 +11,10 @@ void init_heap(uint64_t heapAddress, size_t size) {
     first_free_segment->nextFree = NULL;
     first_free_segment->prevFree = NULL;
     first_free_segment->free = true;
+}
+
+void load_heap(heap_segment_header* first) {
+    first_free_segment = first;
 }
 
 void* malloc(size_t size) {

@@ -17,6 +17,7 @@ bool is_usermode() {
 //#include "paging/paging.cpp"
 #include "memory/memory.cpp"
 #include "memory/heap.cpp"
+#include "memory/sysmem.cpp"
 
 #include "services/proc.cpp"
 #include "services/debug.cpp"
@@ -139,6 +140,8 @@ void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
     init_paging(); // Initialize paging
     init_gdt(); // Initialize the GDT
+    //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
+    //return_to_sysmem(); // Return to system memory
     init_heap(0x100000, 0x200000); // Initialize heap at 0x100000 with a size of 2MB
     init_vga(); // Initialize VGA
     print_string("Initializing processes!\r");
