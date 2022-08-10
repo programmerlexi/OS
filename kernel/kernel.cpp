@@ -163,7 +163,7 @@ void kernel_init() {
     print_string("Installing mouse!\r");
     mouse_install(); // Install the mouse handler
     enable_mouse(); // Enable the mouse
-    proc_create(process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
+    proc_create((void*)process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
     print_string("[OK] Mouse installed!\n\r");
     asm volatile("sti"); // Enable interrupt
     //reset_vga_pos(); // Reset the VGA cursor position
