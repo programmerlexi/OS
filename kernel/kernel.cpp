@@ -1,9 +1,9 @@
-#include "bki.cpp"
-#include "gatr/vga_text.cpp"
+#include "bki.h"
+#include "gatr/vga.h"
 //#include "gatr/vga_graphics.cpp"
-#include "utils/util.cpp"
-#include "utils/math.cpp"
-#include "utils/random.cpp"
+#include "utils/util.h"
+#include "utils/math.h"
+#include "utils/random.h"
 
 bool system = true;
 bool usermode = false;
@@ -15,38 +15,36 @@ bool is_usermode() {
 }
 
 //#include "paging/paging.cpp"
-#include "memory/memory.cpp"
-#include "memory/heap.cpp"
-#include "memory/sysmem.cpp"
+#include "memory/memory.h"
+#include "memory/heap.h"
+#include "memory/sysmem.h"
 
-#include "services/proc.cpp"
-#include "services/debug.cpp"
+#include "services/proc.h"
+#include "services/debug.h"
 
-#include "power/shutdown.cpp"
+#include "power/shutdown.h"
 
 extern "C" { // This is so we can import asm stuff from kernel_entry.asm
-#include "interrupts/irq.cpp"
-#include "interrupts/isr.cpp"
-#include "interrupts/idt.cpp"
-#include "interrupts/syscall.cpp"
-#include "services/timer.cpp"
-#include "services/keyboard.cpp"
-#include "services/scancodeTranslator.cpp"
-#include "services/mouse.cpp"
-#include "paging/paging.cpp"
+#include "interrupts/irq.h"
+#include "interrupts/isr.h"
+#include "interrupts/idt.h"
+#include "interrupts/syscall.h"
+#include "services/timer.h"
+#include "services/keyboard.h"
+#include "services/scancodeTranslator.h"
+#include "services/mouse.h"
+#include "paging/paging.h"
 #include "ring3/umode.h"
 //#include "services/pic.cpp"
 }
-#include "ring3/tss.cpp"
-#include "segmentation/gdt.cpp"
+#include "ring3/tss.h"
+#include "segmentation/gdt.h"
 
 //#include "disk/disk.cpp"
-#include "sound/pcspeaker.cpp"
-#include "services/rtc.cpp"
+#include "sound/pcspeaker.h"
+#include "services/rtc.h"
 
 void kernel_test();
-
-
 
 void test_vga() {
     clear_screen();
@@ -225,3 +223,37 @@ extern "C" void main(){
 
     return;
 }
+
+#include "bki.cpp"
+#include "gatr/vga_text.cpp"
+#include "utils/util.cpp"
+#include "utils/math.cpp"
+#include "utils/random.cpp"
+
+#include "memory/memory.cpp"
+#include "memory/heap.cpp"
+#include "memory/sysmem.cpp"
+
+#include "services/proc.cpp"
+#include "services/debug.cpp"
+
+#include "power/shutdown.cpp"
+
+extern "C" { // This is so we can import asm stuff from kernel_entry.asm
+#include "interrupts/irq.cpp"
+#include "interrupts/isr.cpp"
+#include "interrupts/idt.cpp"
+#include "interrupts/syscall.cpp"
+#include "services/timer.cpp"
+#include "services/keyboard.cpp"
+#include "services/scancodeTranslator.cpp"
+#include "services/mouse.cpp"
+#include "paging/paging.cpp"
+#include "ring3/umode.h"
+}
+
+#include "ring3/tss.cpp"
+#include "segmentation/gdt.cpp"
+
+#include "sound/pcspeaker.cpp"
+#include "services/rtc.cpp"

@@ -1,5 +1,6 @@
+#include "pcspeaker.h"
  //Play sound using built in speaker
- static void play_sound(uint32_t nFrequence) {
+static void play_sound(uint32_t nFrequence) {
  	uint32_t Div;
  	uint8_t tmp;
  

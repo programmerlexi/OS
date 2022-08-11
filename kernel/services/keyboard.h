@@ -93,5 +93,7 @@ unsigned char kbdus_shift[128] =
 bool shift_pressed = false;
 bool caps_lock = false;
 bool enter_pressed = false;
-/*void clear_input();
-char* get_input();*/
+void clear_input();
+char* get_input();
+void set_input(bool input);
+void kb_install();

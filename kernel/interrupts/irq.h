@@ -22,3 +22,4 @@ extern "C" void irq12();
 extern "C" void irq13();
 extern "C" void irq14();
 extern "C" void irq15();
+void irq_install();

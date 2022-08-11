@@ -23,10 +23,11 @@ struct Process {
 #define MAX_PID 255
 
 void kernel_loop();
-void proc_create(void* loop_func);
+void proc_create(void* loop_func,char*);
 void proc_quit(int exit_code);
-int proc_fork(void* loop_func);
+int proc_fork(void* loop_func,char*);
 void proc_cycle();
+void proc_init();
 
 Process proc_list[256];
 uint8_t cur_pid;
