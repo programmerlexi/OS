@@ -138,9 +138,12 @@ GDT_descriptor:
 
 [bits 32]
 start_protected_mode:
-    mov al, 'A'
+    mov al, 'P'
     mov ah, 0x0f
     mov [0xb8000], ax
+    mov al, 'M'
+    mov ah, 0x0f
+    mov [0xb8002], ax
     jmp KERNEL_LOCATION
     jmp $
 times 510-($-$$) db 0
