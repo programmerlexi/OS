@@ -171,11 +171,8 @@ void kernel_test() {
 
 void kernel_main() {
     enter_debug_scope((char*)"kernel_main");
-    /*while(1) {
-        terminal_loop(); // Run the terminal
-    }*/
-    //print_time(); // Print the time
-    //print_string("\n\r");
+    print_time(); // Print the time
+    print_string("\n\r");
     print_string("Running CPU detection!\n\r");
     cpu_detect(); // Detect the CPU
     print_string("Lower Memory: ");

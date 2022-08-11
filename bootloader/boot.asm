@@ -17,7 +17,7 @@ main:
     popa
 
     mov bx, KERNEL_LOCATION
-    mov dh, 58
+    mov dh, 67
 
     mov ah, 0x02
     mov al, dh 
