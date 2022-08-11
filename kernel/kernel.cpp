@@ -1,6 +1,5 @@
 #include "bki.h"
 #include "gatr/vga.h"
-//#include "gatr/vga_graphics.cpp"
 #include "utils/util.h"
 #include "utils/math.h"
 #include "utils/random.h"
@@ -14,7 +13,6 @@ bool is_usermode() {
     return usermode;
 }
 
-//#include "paging/paging.cpp"
 #include "memory/memory.h"
 #include "memory/heap.h"
 #include "memory/sysmem.h"
@@ -35,12 +33,10 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "services/mouse.h"
 #include "paging/paging.h"
 #include "ring3/umode.h"
-//#include "services/pic.cpp"
 }
 #include "ring3/tss.h"
 #include "segmentation/gdt.h"
 
-//#include "disk/disk.cpp"
 #include "sound/pcspeaker.h"
 #include "services/rtc.h"
 
@@ -97,15 +93,6 @@ void test_memory() {
     free(t5);
 
     print_string("\n\n\r");
-
-    /*void* t6 = alinged_alloc(0x4000, 0x10);
-    
-    print_string("\n\rt6: ");
-    str = HexToString((uint64_t)t6);
-    print_string(str);
-    print_string("\n\r");
-
-    free(t6);*/
 }
 
 void test_color() {
@@ -128,8 +115,6 @@ extern "C" {
         //print_string("Welcome to usermode!\n\r");
     }
 }
-
-//#include "usermode/desktop.cpp"
 
 #include "cpuid.cpp"
 #include "kernel_shell.cpp"
@@ -249,7 +234,6 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "services/scancodeTranslator.cpp"
 #include "services/mouse.cpp"
 #include "paging/paging.cpp"
-#include "ring3/umode.h"
 }
 
 #include "ring3/tss.cpp"
