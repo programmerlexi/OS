@@ -140,9 +140,9 @@ void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
     init_paging(); // Initialize paging
     init_gdt(); // Initialize the GDT
-    //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
+    init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     //return_to_sysmem(); // Return to system memory
-    init_heap(0x100000, 0x200000); // Initialize heap at 0x100000 with a size of 2MB
+    //init_heap(0x100000, 0x200000); // Initialize heap at 0x100000 with a size of 2MB
     init_vga(); // Initialize VGA
     print_string("Initializing processes!\r");
     proc_init(); // Initialize processses

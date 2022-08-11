@@ -1,7 +1,7 @@
 #include "sysmem.h"
 #include "heap.h"
 sysmem_t* sysmem;
-void init_sysmem(uint32_t start, uint32_t size) {
+void init_sysmem(uint64_t start, size_t size) {
     sysmem = (sysmem_t*)start;
     sysmem->size = size;
     sysmem->next = NULL;
@@ -11,12 +11,12 @@ void init_sysmem(uint32_t start, uint32_t size) {
 sysmem_t* get_sysmem_seg() {
     sysmem_t* current = sysmem;
     while (current->next != NULL) {
-        current = sysmem->next;
+        current = current->next;
     }
-    return current+sizeof(sysmem_t)+current->size;
+    return current;
 }
 sysmem_t* get_sysmem_seg_next() {
-    return get_sysmem_seg()->next;
+    return get_sysmem_seg()+sizeof(sysmem_t)+get_sysmem_seg()->size;
 }
 sysmem_t* add_new_sysmem(uint32_t size) {
     sysmem_t* new_sysmem = get_sysmem_seg_next();

@@ -95,36 +95,64 @@ const char* exception_messages[] =
 	"Reserved Exeption."
 };
 
+void panic_char(char c, int idx)
+{
+	((char*)0xB8000)[idx*2] = c;
+	((char*)0xB8000)[idx*2+1] = 0x1f;
+}
 
+void panic_print(const char* message, int idx)
+{
+	int i = 0;
+	while (message[i] != '\0')
+	{
+		panic_char(message[i], idx+i);
+		i++;
+	}
+}
+
+void panic_clear() {
+	for (int j = 0; j < 25; j++) {
+		for (int i = 0; i < 80; i++) {
+			panic_char('\0', i+j*80);
+		}
+	}
+}
+
+void panic_cursor_off() {
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}
+
+void panic_dump_regs(int idx, regs* r) {
+	panic_print("Register Dump:", idx);
+	panic_print("EAX:", idx+84);
+	panic_print(HexToString(r->eax), idx+88);
+	panic_print("EBX:", idx+164);
+	panic_print(HexToString(r->ebx), idx+168);
+	panic_print("ECX:", idx+244);
+	panic_print(HexToString(r->ecx), idx+248);
+	panic_print("EDX:", idx+324);
+	panic_print(HexToString(r->edx), idx+328);
+
+	panic_print("ESP:", idx+484);
+	panic_print(HexToString(r->esp), idx+488);
+	panic_print("EBP:", idx+564);
+	panic_print(HexToString(r->ebp), idx+568);
+}
 
 extern "C" void _fault_handler(struct regs *r)
 {
     if (r->int_no < 32)
     {
 		asm("cli");
-		if (is_system()) {
-			clear_screen();
-			print_string("An Error occured and the System stopped working.\n\r");
-			print_string("Error: ");
-			print_string(exception_messages[r->int_no]);
-			print_string("\n\r");
-			print_string("Error code: ");
-			print_string(num_to_char(r->err_code));
-			print_string("\n\r");
-			print_string("Interrupt number: ");
-			print_string(num_to_char(r->int_no));
-			print_string("\n\r");
-			print_string("Error Location: ");
-			print_string(get_debug_location());
-			swap_buffers();
-		} else if (is_usermode()) {
-			print_string(proc_name());
-			print_string(": ");
-			print_string(exception_messages[r->int_no]);
-			print_string("\n\r");
-			swap_buffers();    
-		}
-		if (strcmp(exception_messages[r->int_no], "Page Fault Exeption.")) {
+		panic_clear();
+		panic_print("Error: ", 0);
+		panic_print(exception_messages[r->int_no], 7);
+		panic_dump_regs(80, r);
+		panic_cursor_off();
+		asm("hlt");
+		/*if (strcmp(exception_messages[r->int_no], "Page Fault Exeption.")) {
 			switch (r->err_code&1) {
 				case 0:
 					print_string("Supervisor process");
@@ -155,9 +183,7 @@ extern "C" void _fault_handler(struct regs *r)
 					print_string("present page\n\r");
 					break;
 			}
-			swap_buffers();
-			disable_cursor();
-		}
+		}*/
 		for (;;);
     }
 }
