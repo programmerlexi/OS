@@ -112,7 +112,6 @@ void test_proc() {
 extern "C" {
     void test_user_function() {
         for (;;);
-        //print_string("Welcome to usermode!\n\r");
     }
 }
 
@@ -124,8 +123,6 @@ void kernel_init() {
     init_paging(); // Initialize paging
     init_gdt(); // Initialize the GDT
     init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
-    //return_to_sysmem(); // Return to system memory
-    //init_heap(0x100000, 0x200000); // Initialize heap at 0x100000 with a size of 2MB
     init_vga(); // Initialize VGA
     print_string("Initializing processes!\r");
     proc_init(); // Initialize processses
@@ -153,7 +150,6 @@ void kernel_init() {
     proc_create((void*)process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
     print_string("[OK] Mouse installed!\n\r");
     asm volatile("sti"); // Enable interrupt
-    //reset_vga_pos(); // Reset the VGA cursor position
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
     exit_debug_scope();
@@ -161,10 +157,7 @@ void kernel_init() {
 
 void kernel_test() {
     enter_debug_scope((char*)"kernel_test");
-    //test_color(); // Test the vga colors
-
     test_vga(); // Test the vga driver in general
-    
     test_memory(); // Test the memory manager
     exit_debug_scope();
 }
@@ -190,7 +183,6 @@ void kernel_main() {
     print_string("Disk: 0x");
     uint8_t disk = *((uint8_t*)0x5004);
     print_string(HexToString(disk));
-    //print_string("\n\r");
     terminal_init(); // Initialize the terminal
     proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();
