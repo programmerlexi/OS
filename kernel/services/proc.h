@@ -28,6 +28,11 @@ void proc_quit(int exit_code);
 int proc_fork(void* loop_func,char*);
 void proc_cycle();
 void proc_init();
+void proc_wait();
+void proc_signal(int pid);
+void proc_lock();
+void proc_unlock();
+
 
 Process proc_list[256];
 uint8_t cur_pid;

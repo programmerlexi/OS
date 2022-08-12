@@ -66,6 +66,9 @@ void proc_quit(int exit_code) {
     if (cur_pid >= newest_pid) {
         return;
     }
+    if (proc_list[cur_pid].parent_pid != 0) {
+        proc_signal(proc_list[cur_pid].parent_pid);
+    }
     proc_list[cur_pid].state = PROC_DEAD;
     proc_list[cur_pid].exit_code = exit_code;
 }
@@ -74,4 +77,21 @@ int proc_fork(void* loop_func, char* name) {
     proc_create(loop_func, name);
     proc_list[newest_pid-1].parent_pid = proc_list[cur_pid].pid;
     return newest_pid-1;
+}
+
+void proc_wait() {
+    if (cur_pid >= newest_pid) {
+        return;
+    }
+    proc_list[cur_pid].state = PROC_WAITING;
+    proc_cycle();
+}
+
+void proc_signal(int pid) {
+    if (cur_pid >= newest_pid) {
+        return;
+    }
+    if (proc_list[pid].state == PROC_WAITING) {
+        proc_list[pid].state = PROC_READY;
+    }
 }

@@ -118,16 +118,19 @@ void terminal_loop() {
             set_input(false);
             if (strcmp(input, "help")) {
                 enter_debug_scope((char*)"help");
+                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)help,"help");
                 exit_debug_scope();
             } else if (strcmp(input, "user")) {
                 enter_debug_scope((char*)"user");
+                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)user,"user");
                 exit_debug_scope();
             } else if (strcmp(input, "shutdown")) {
                 enter_debug_scope((char*)"shutdown");
+                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)shutdown,"shutdown");
                 exit_debug_scope();
@@ -143,6 +146,7 @@ void terminal_loop() {
                 for (int i = 0; i < 10; i++) {
                     if (strcmp(input, programs[i].name)) {
                         enter_debug_scope((char*)"program");
+                        proc_wait();
                         found = true;
                         started = true;
                         sub_pid = proc_fork((void*)programs[i].func,(const char*)programs[i].name);
