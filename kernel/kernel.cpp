@@ -183,6 +183,12 @@ void kernel_main() {
     print_string("Disk: 0x");
     uint8_t disk = *((uint8_t*)0x5004);
     print_string(HexToString(disk));
+    if (disk & 0x80) {
+        print_string(" (HDD)");
+    } else {
+        print_string(" (Floppy or Unknown)");
+    }
+    return;
     terminal_init(); // Initialize the terminal
     proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();

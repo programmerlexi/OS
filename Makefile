@@ -45,7 +45,7 @@ iso: image
 
 run: image setup
 	echo "Launching"
-	qemu-system-i386 -hda images/OS.bin -m 4G
+	qemu-system-i386 images/OS.bin -m 4G
 #096M
 
 
