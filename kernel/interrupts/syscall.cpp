@@ -3,13 +3,17 @@ extern void _syscall();
 #include "idt.h"
 #include "syscall.h"
 #include <stdint.h>
+#include "../services/proc.h"
 
 void sys_0(regs* r) {
     power_shutdown();
 }
-void sys_1(regs* r) {
+void fork(regs* r) {
+    proc_fork(proc_list[cur_pid].loop, proc_list[cur_pid].name);
 }
-void sys_2(regs* r) {
+void exec(regs* r) {
+    proc_quit(0);
+    proc_create((void*)r->eax, (char*)r->ebx);
 }
 void sys_3(regs* r) {
 }
@@ -54,8 +58,8 @@ void sys_init(){
 void syscall_c(regs* r){
     switch(r->eax) {
         case 0x00: sys_0(r); break;
-        case 0x01: sys_1(r); break;
-        case 0x02: sys_2(r); break;
+        case 0x01: fork(r); break;
+        case 0x02: exec(r); break;
         case 0x03: sys_3(r); break;
         case 0x04: sys_4(r); break;
         case 0x05: sys_5(r); break;
