@@ -5,7 +5,7 @@ extern void _syscall();
 #include <stdint.h>
 #include "../services/proc.h"
 
-void sys_0(regs* r) {
+void down(regs* r) {
     power_shutdown();
 }
 void fork(regs* r) {
@@ -15,11 +15,20 @@ void exec(regs* r) {
     proc_quit(0);
     proc_create((void*)r->eax, (char*)r->ebx);
 }
-void sys_3(regs* r) {
+void exit(regs* r) {
+    proc_quit(r->eax);
 }
-void sys_4(regs* r) {
+void time(regs* r) {
+    read_rtc();
+    r->eax = second;
+    r->ebx = minute;
+    r->ecx = hour;
 }
-void sys_5(regs* r) {
+void date(regs* r) {
+    read_rtc();
+    r->eax = day;
+    r->ebx = month;
+    r->ecx = year;
 }
 void sys_6(regs* r) {
 }
@@ -57,12 +66,12 @@ void sys_init(){
 
 void syscall_c(regs* r){
     switch(r->eax) {
-        case 0x00: sys_0(r); break;
+        case 0x00: down(r); break;
         case 0x01: fork(r); break;
         case 0x02: exec(r); break;
-        case 0x03: sys_3(r); break;
-        case 0x04: sys_4(r); break;
-        case 0x05: sys_5(r); break;
+        case 0x03: exit(r); break;
+        case 0x04: time(r); break;
+        case 0x05: date(r); break;
         case 0x06: sys_6(r); break;
         case 0x07: sys_7(r); break;
         case 0x08: sys_8(r); break;
