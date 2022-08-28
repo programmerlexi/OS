@@ -193,8 +193,8 @@ void kernel_main() {
     } else {
         print_string(" (Floppy or Unknown)");
     }
-    //terminal_init(); // Initialize the terminal
-    //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
+    terminal_init(); // Initialize the terminal
+    proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();
 }
 
