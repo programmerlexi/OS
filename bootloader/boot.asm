@@ -2,17 +2,20 @@
 ; Bootloader
 main:
     KERNEL_LOCATION equ 0x00007EF0
-    mov [BOOT_DISK], dl
+    mov [0x5004], dl
     xor ax, ax                          
     mov es, ax
     mov ds, ax
     mov bp, 0x7c00
     mov sp, bp
     
+    ;clear the screen
+	mov ah, 0x00
+	mov al, 0x3
+	int 0x10
+
     call memory_detection
     call upper_memory_detection
-    mov al, [BOOT_DISK]
-    mov [0x5004], al
     
 
     mov bx, KERNEL_LOCATION
@@ -23,7 +26,7 @@ main:
     mov ch, 0x00
     mov dh, 0x00
     mov cl, 0x02
-    mov dl, [BOOT_DISK]
+    mov dl, [0x5004]
     int 0x13
     jnc after_load
     mov ah, 0x0e
@@ -202,7 +205,6 @@ end:
     ret
 jmp $
 
-BOOT_DISK: db 0
 label: db "Hello, world!", 0
 good: db "Sucess!", 0xD, 0xA, 0
 failed_disk: db "Failed to load Kernel!", 0
@@ -258,7 +260,6 @@ start_protected_mode:
     mov ah, 0x0f ; bg=black fg=white
     mov al, 'A'
     mov [0xb80000], ax
-
     jmp KERNEL_LOCATION
     jmp $
 times 510-($-$$) db 0
