@@ -203,21 +203,13 @@ end:
 jmp $
 
 BOOT_DISK: db 0
-label:
-    db "Hello, world!", 0
-
-good:
-    db "Sucess!", 0xD, 0xA, 0
-
-failed_disk:
-    db "Failed to load Kernel!", 0
-failed_mem:
-    db "Failed to detect memory!", 0
+label: db "Hello, world!", 0
+good: db "Sucess!", 0xD, 0xA, 0
+failed_disk: db "Failed to load Kernel!", 0
+failed_mem: db "Failed to detect memory!", 0
 a20_not_supported:
-a20_activation_failed:
-    db "A20 failed!", 0
-a20_enabled:
-    db "A20 enabled!", 0
+a20_activation_failed: db "A20 failed!", 0
+a20_enabled: db "A20 enabled!", 0
 
 CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
@@ -242,7 +234,6 @@ GDT_start:                          ; must be at the end of real mode code
         db 0b10010010
         db 0b11001111
         db 0x0
-
 GDT_end:
 
 GDT_descriptor:
@@ -251,18 +242,23 @@ GDT_descriptor:
 
 [bits 32]
 start_protected_mode:
+    ; reset the segments
     mov ax, DATA_SEG
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-    ;set up the stack
-	mov ebp, 0xf0000
+    
+    ; set up the stack
+	mov ebp, 0xf0000 ; maximum stack size
 	mov esp, ebp
+
+    ; print an "A"
     mov ah, 0x0f ; bg=black fg=white
     mov al, 'A'
     mov [0xb80000], ax
+
     jmp KERNEL_LOCATION
     jmp $
 times 510-($-$$) db 0
