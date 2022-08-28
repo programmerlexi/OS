@@ -11,10 +11,9 @@ main:
     
     call memory_detection
     call upper_memory_detection
-    pusha
     mov al, [BOOT_DISK]
     mov [0x5004], al
-    popa
+    
 
     mov bx, KERNEL_LOCATION
     mov dh, 67
@@ -28,17 +27,13 @@ main:
     int 0x13
     jnc after_load
     mov ah, 0x0e
-    mov bx, failed
+    mov bx, failed_disk
     call print_string
     jmp $
 memory_detection:
     clc
     int 0x12
-    jnc after_memory_detection
-    mov ah, 0x0e
-    mov bx, failed
-    call print_string
-    jmp $
+    jc failed_memory
 after_memory_detection:
     mov [0x5000], ax
     ret
@@ -46,6 +41,8 @@ upper_memory_detection:
     ;detect upper memory.
     mov ax, 0xE801
     int 0x15
+    jc failed_memory
+after_upper_memory_detection:
     xor dx, dx
     mov cx, 1024
     div cx
@@ -60,6 +57,11 @@ upper_memory_detection:
     mov ax, cx
     mov [0x5002], ax
     ret
+failed_memory:
+    mov ah, 0x0e
+    mov bx, failed_mem
+    call print_string
+    jmp $
 after_load:
     mov ah, 0x0e
     mov bx, good
@@ -79,11 +81,115 @@ after_load:
     jmp CODE_SEG:start_protected_mode
     jmp $
 
-enableA20:
-    in al, 0x92
-    or al, 2
-    out 0x92, al
+check_a20:
+    pushf
+    push ds
+    push es
+    push di
+    push si
+ 
+    cli
+ 
+    xor ax, ax ; ax = 0
+    mov es, ax
+ 
+    not ax ; ax = 0xFFFF
+    mov ds, ax
+ 
+    mov di, 0x0500
+    mov si, 0x0510
+ 
+    mov al, byte [es:di]
+    push ax
+ 
+    mov al, byte [ds:si]
+    push ax
+ 
+    mov byte [es:di], 0x00
+    mov byte [ds:si], 0xFF
+ 
+    cmp byte [es:di], 0xFF
+ 
+    pop ax
+    mov byte [ds:si], al
+ 
+    pop ax
+    mov byte [es:di], al
+ 
+    mov ax, 0
+    je check_a20__exit
+ 
+    mov ax, 1
+ 
+check_a20__exit:
+    pop si
+    pop di
+    pop es
+    pop ds
+    popf
+ 
     ret
+
+enableA20:
+    call A20check
+a20_bios_func:
+    mov     ax,2403h                ;--- A20-Gate Support ---
+    int     15h
+    jb      A20ns                  ;INT 15h is not supported
+    cmp     ah,0
+    jnz     A20ns                  ;INT 15h is not supported
+    
+    mov     ax,2402h                ;--- A20-Gate Status ---
+    int     15h
+    jb      A20failed              ;couldn't get status
+    cmp     ah,0
+    jnz     A20failed              ;couldn't get status
+    
+    cmp     al,1
+    jz      A20done                 ;A20 is already activated
+    
+    mov     ax,2401h                ;--- A20-Gate Activate ---
+    int     15h
+    jb      A20failed              ;couldn't activate the gate
+    cmp     ah,0
+    jnz     A20failed              ;couldn't activate the gate
+ 
+a20_activated:                  ;go on
+    call A20check
+fastA20:
+    in al, 0x92
+    test al, 2
+    jnz after
+    or al, 2
+    and al, 0xFE
+    out 0x92, al
+after:
+    mov bx, 0xffff
+chk_loop:
+    call A20check
+    sub bx, 1
+    jnz chk_loop
+    jmp A20failed
+A20check:
+    call check_a20
+    test ax,ax
+    jnz A20done
+    ret
+A20done:
+    mov ah, 0x0e
+    mov bx, a20_enabled
+    call print_string
+    ret
+A20failed:
+    mov ah, 0x0e
+    mov bx, a20_activation_failed
+    call print_string
+    jmp $
+A20ns:
+    mov ah, 0x0e
+    mov bx, a20_not_supported
+    call print_string
+    jmp $
 
 print_string:
     mov al, [bx]
@@ -103,8 +209,15 @@ label:
 good:
     db "Sucess!", 0xD, 0xA, 0
 
-failed:
-    db "Failed to load Kernel from Disk!", 0
+failed_disk:
+    db "Failed to load Kernel!", 0
+failed_mem:
+    db "Failed to detect memory!", 0
+a20_not_supported:
+a20_activation_failed:
+    db "A20 failed!", 0
+a20_enabled:
+    db "A20 enabled!", 0
 
 CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
@@ -138,12 +251,18 @@ GDT_descriptor:
 
 [bits 32]
 start_protected_mode:
-    mov al, 'P'
-    mov ah, 0x0f
-    mov [0xb8000], ax
-    mov al, 'M'
-    mov ah, 0x0f
-    mov [0xb8002], ax
+    mov ax, DATA_SEG
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+    ;set up the stack
+	mov ebp, 0xf0000
+	mov esp, ebp
+    mov ah, 0x0f ; bg=black fg=white
+    mov al, 'A'
+    mov [0xb80000], ax
     jmp KERNEL_LOCATION
     jmp $
 times 510-($-$$) db 0

@@ -128,6 +128,13 @@ static int check_pae(void)
     return edx & CPUID_FEAT_EDX_PAE;
 }
 
+static int check_pge(void)
+{
+	unsigned int eax = 0, unused = 0, edx = 0;
+	__get_cpuid(1, &eax, &unused, &unused, &edx);
+	return edx & CPUID_FEAT_EDX_PGE;
+}
+
 static int check_sse(void)
 {
     unsigned int eax = 0, unused = 0, edx = 0;

@@ -120,10 +120,15 @@ extern "C" {
 
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
-    init_paging(); // Initialize paging
+    if (check_pge()) {
+        init_paging(); // Initialize paging if its available
+    }
     init_gdt(); // Initialize the GDT
     init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     init_vga(); // Initialize VGA
+    if (check_pge()) {
+        print_string("[OK] Paging Enabled\n\r");
+    }
     print_string("Initializing processes!\r");
     proc_init(); // Initialize processses
     print_string("[OK] Processes initialized!\n\r");
@@ -188,8 +193,8 @@ void kernel_main() {
     } else {
         print_string(" (Floppy or Unknown)");
     }
-    terminal_init(); // Initialize the terminal
-    proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
+    //terminal_init(); // Initialize the terminal
+    //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();
 }
 
