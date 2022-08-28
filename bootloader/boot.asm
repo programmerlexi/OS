@@ -6,8 +6,7 @@ main:
     xor ax, ax                          
     mov es, ax
     mov ds, ax
-    mov bp, 0x7c00
-    mov sp, bp
+    mov sp, 0x7c00 ; Does the stack work with out a base address? YES.
     
     ;clear the screen
 	mov ah, 0x00
@@ -176,7 +175,11 @@ chk_loop:
 A20check:
     call check_a20
     test ax,ax
-    jnz A20done
+    jz .end  
+.succes:
+    call A20done
+    pop ax
+.end:
     ret
 A20done:
     mov ah, 0x0e
@@ -206,7 +209,7 @@ end:
 jmp $
 
 label: db "Hello, world!", 0
-good: db "Sucess!", 0xD, 0xA, 0
+good: db "Success!", 0xD, 0xA, 0
 failed_disk: db "Failed to load Kernel!", 0
 failed_mem: db "Failed to detect memory!", 0
 a20_not_supported:
