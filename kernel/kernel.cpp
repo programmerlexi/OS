@@ -136,9 +136,9 @@ void kernel_init() {
     print_string("Initializing interrupts!\r");
     idt_install(); // Create the IDT
     print_string("[OK] Interrupts initialized!\n\r");
-    print_string("Installing IRQs!\r");
+    print_string("Installing ISRs!\r");
     isrs_install(); // Install the ISRs into the IDT
-    print_string("[OK] IRQs installed!     \n\r");
+    print_string("[OK] ISRs installed!     \n\r");
     print_string("Installing syscalls!\r");
     irq_install(); // Install the IRQs into the IDT
     sys_init(); // Initialize the syscall handler

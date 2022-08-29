@@ -98,7 +98,7 @@ const char* exception_messages[] =
 void panic_char(char c, int idx)
 {
 	((char*)0xB8000)[idx*2] = c;
-	((char*)0xB8000)[idx*2+1] = 0x1f;
+	((char*)0xB8000)[idx*2+1] = 0x9f; // White on Ligth blue
 }
 
 void panic_print(const char* message, int idx)
@@ -139,7 +139,34 @@ void panic_dump_regs(int idx, regs* r) {
 	panic_print(HexToString(r->esp), idx+488);
 	panic_print("EBP:", idx+564);
 	panic_print(HexToString(r->ebp), idx+568);
+
+	panic_print("EIP:", idx+724);
+	panic_print(HexToString(r->eip), idx+728);
 }
+
+void panic_color(char color, int idx) {
+	((char*)0xB8000)[idx*2+1] = color;
+}
+
+void panic_bitmap(int idx, int* bitmap, int rows, int cols) {
+	for (int i = 0; i < rows; i++) {
+		char pix = bitmap[i];
+		int x = idx+i*80;
+		for (int j = 0; j < cols; j++) {
+			if (pix&1) {
+				panic_color(0xff,x+j);
+			}
+			pix >>= 1;
+		}
+	}
+}
+
+int smiley[5] = {
+	0b10000001,
+	0b00000000,
+	0b01111110,
+	0b10000001
+};
 
 extern "C" void _fault_handler(struct regs *r)
 {
@@ -147,43 +174,20 @@ extern "C" void _fault_handler(struct regs *r)
     {
 		asm("cli");
 		panic_clear();
-		panic_print("Error: ", 0);
-		panic_print(exception_messages[r->int_no], 7);
-		panic_dump_regs(80, r);
+		panic_print("Error: ", 20);
+		panic_print(exception_messages[r->int_no], 27);
+		panic_dump_regs(100, r);
+		panic_bitmap(325,smiley,4,8);
+		panic_print(" If you encounter this error",1200+80*6);
+		panic_print(" and you did not modify the code,",1280+80*6);
+		panic_print(" please report it to the author.",1360+80*6);
+		panic_print("   The System will now freeze ",522);
+		panic_print("      and you will have to    ",602);
+		panic_print("       reboot it manually.    ",682);
+		panic_print("Debug Scope: ", 1120+80*2+45);
+		panic_print(get_debug_location(),1120+80*2+45+13);
 		panic_cursor_off();
 		asm("hlt");
-		/*if (strcmp(exception_messages[r->int_no], "Page Fault Exeption.")) {
-			switch (r->err_code&1) {
-				case 0:
-					print_string("Supervisor process");
-					if (is_usermode()) {
-						print_string(" (");
-						print_string(proc_name());
-						print_string(")");
-					}
-					print_string(" tried to ");
-					break;
-				case 1:
-					print_string("User process tried to ");
-					break;
-			}
-			switch ((r->err_code>>1)&1) {
-				case 0:
-					print_string("read from ");
-					break;
-				case 1:
-					print_string("write to ");
-					break;
-			}
-			switch ((r->err_code>>2)&1) {
-				case 0:
-					print_string("non-present page\n\r");
-					break;
-				case 1:
-					print_string("present page\n\r");
-					break;
-			}
-		}*/
 		for (;;);
     }
 }
