@@ -151,10 +151,10 @@ void panic_color(char color, int idx) {
 void panic_bitmap(int idx, int* bitmap, int rows, int cols) {
 	for (int i = 0; i < rows; i++) {
 		char pix = bitmap[i];
-		int x = idx+i*80;
+		int x = idx+i*80+cols;
 		for (int j = 0; j < cols; j++) {
 			if (pix&1) {
-				panic_color(0xff,x+j);
+				panic_color(0xff,x-j);
 			}
 			pix >>= 1;
 		}
@@ -189,5 +189,5 @@ extern "C" void _fault_handler(struct regs *r)
 		panic_cursor_off();
 		asm("hlt");
 		for (;;);
-    }
+ 	}
 }
