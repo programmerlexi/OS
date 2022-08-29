@@ -212,5 +212,5 @@ extern "C" void main(){
 }
 #include "klib.cpp"
 void verify_kernel(void) {
-    print_string("Verified that kernel is fully loaded!\n\r");
+    print_string("Verified that the kernel is fully loaded!\n\r");
 }
