@@ -33,6 +33,11 @@ void clear() {
     proc_quit(0);
 }
 
+void crash() {
+    char i = 10/0;
+    print_char(i);
+}
+
 void cpu_info() {
     print_string("CPU Vendor: ");
     print_string(get_vendor());

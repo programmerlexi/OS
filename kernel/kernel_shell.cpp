@@ -40,6 +40,7 @@ void load_programs() {
     build_program(procs,"procs","prints the process list");
     build_program(time,"time","prints the current time");
     build_program(date,"date","prints the current date");
+    build_program(crash,"crash","crashes the system");
 }
 
 int sub_pid;
@@ -148,11 +149,11 @@ void terminal_loop() {
                 bool found = false;
                 for (int i = 0; i < 10; i++) {
                     if (strcmp(input, programs[i].name)) {
-                        enter_debug_scope((char*)"program");
+                        enter_debug_scope((char*)"program creation");
                         proc_wait();
                         found = true;
                         started = true;
-                        sub_pid = proc_fork((void*)programs[i].func,(const char*)programs[i].name);
+                        sub_pid = proc_fork((void*)programs[i].func,(char*)programs[i].name);
                         exit_debug_scope();
                         break;
                     }
