@@ -4,6 +4,7 @@
 
 #define GDT_CODE_SEGMENT 0x08
 #define GDT_DATA_SEGMENT 0x10
+#define GDT_STACK_SEGMENT 0x18
 
 typedef struct
 {
@@ -70,7 +71,7 @@ typedef enum
     GDT_BASE_HIGH(base)                                             \
 }
 
-GDTEntry g_GDT[6];
+GDTEntry g_GDT[7];
 
 extern "C" void __attribute__((cdecl)) load_gdt(GDTDescriptor* descriptor, uint16_t codeSegment, uint16_t dataSegment);
 

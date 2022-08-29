@@ -95,99 +95,10 @@ const char* exception_messages[] =
 	"Reserved Exeption."
 };
 
-void panic_char(char c, int idx)
-{
-	((char*)0xB8000)[idx*2] = c;
-	((char*)0xB8000)[idx*2+1] = 0x9f; // White on Ligth blue
-}
-
-void panic_print(const char* message, int idx)
-{
-	int i = 0;
-	while (message[i] != '\0')
-	{
-		panic_char(message[i], idx+i);
-		i++;
-	}
-}
-
-void panic_clear() {
-	for (int j = 0; j < 25; j++) {
-		for (int i = 0; i < 80; i++) {
-			panic_char('\0', i+j*80);
-		}
-	}
-}
-
-void panic_cursor_off() {
-	outb(0x3D4, 0x0A);
-	outb(0x3D5, 0x20);
-}
-
-void panic_dump_regs(int idx, regs_t* r) {
-	panic_print("Register Dump:", idx);
-	panic_print("EAX:", idx+84);
-	panic_print(HexToString(r->eax), idx+88);
-	panic_print("EBX:", idx+164);
-	panic_print(HexToString(r->ebx), idx+168);
-	panic_print("ECX:", idx+244);
-	panic_print(HexToString(r->ecx), idx+248);
-	panic_print("EDX:", idx+324);
-	panic_print(HexToString(r->edx), idx+328);
-
-	panic_print("ESP:", idx+484);
-	panic_print(HexToString(r->esp), idx+488);
-	panic_print("EBP:", idx+564);
-	panic_print(HexToString(r->ebp), idx+568);
-
-	panic_print("EIP:", idx+724);
-	panic_print(HexToString(r->eip), idx+728);
-}
-
-void panic_color(char color, int idx) {
-	((char*)0xB8000)[idx*2+1] = color;
-}
-
-void panic_bitmap(int idx, int* bitmap, int rows, int cols) {
-	for (int i = 0; i < rows; i++) {
-		char pix = bitmap[i];
-		int x = idx+i*80+cols;
-		for (int j = 0; j < cols; j++) {
-			if (pix&1) {
-				panic_color(0xff,x-j);
-			}
-			pix >>= 1;
-		}
-	}
-}
-
-int smiley[5] = {
-	0b10000001,
-	0b00000000,
-	0b01111110,
-	0b10000001
-};
-
 extern "C" void _fault_handler(regs_t *r)
 {
     if (r->int_no < 32)
     {
-		asm("cli");
-		panic_clear();
-		panic_print("Error: ", 20);
-		panic_print(exception_messages[r->int_no], 27);
-		panic_dump_regs(100, r);
-		panic_bitmap(325,smiley,4,8);
-		panic_print(" If you encounter this error",1200+80*6);
-		panic_print(" and you did not modify the code,",1280+80*6);
-		panic_print(" please report it to the author.",1360+80*6);
-		panic_print("   The System will now freeze ",522);
-		panic_print("      and you will have to    ",602);
-		panic_print("       reboot it manually.    ",682);
-		panic_print("Debug Scope: ", 1120+80*2+45);
-		panic_print(get_debug_location(),1120+80*2+45+13);
-		panic_cursor_off();
-		asm("hlt");
-		for (;;);
+		kpanic(exception_messages[r->int_no],r);
  	}
 }

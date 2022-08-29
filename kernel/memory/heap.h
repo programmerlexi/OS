@@ -31,3 +31,4 @@ void combine_free_segments(heap_segment_header* a, heap_segment_header* b);
 void free(void* ptr);
 void* alinged_alloc(uint64_t alingment, size_t size);
 void load_heap(heap_segment_header* heap);
+int count_segments();

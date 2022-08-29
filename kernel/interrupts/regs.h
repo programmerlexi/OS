@@ -9,3 +9,4 @@ typedef struct regs
 } regs_t;
 
 void fill_reg(struct regs *reg);
+regs_t* get_regs();

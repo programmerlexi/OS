@@ -3,6 +3,7 @@
 #include "utils/util.cpp"
 #include "utils/math.cpp"
 #include "utils/random.cpp"
+#include "interrupts/regs.cpp"
 
 #include "memory/memory.cpp"
 #include "memory/heap.cpp"

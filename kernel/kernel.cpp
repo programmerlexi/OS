@@ -42,6 +42,102 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 
 void kernel_test();
 
+void panic_char(char c, int idx)
+{
+	((char*)0xB8000)[idx*2] = c;
+	((char*)0xB8000)[idx*2+1] = 0x9f; // White on Ligth blue
+}
+
+void panic_print(const char* message, int idx)
+{
+	int i = 0;
+	while (message[i] != '\0')
+	{
+		panic_char(message[i], idx+i);
+		i++;
+	}
+}
+
+void panic_clear() {
+	for (int j = 0; j < 25; j++) {
+		for (int i = 0; i < 80; i++) {
+			panic_char('\0', i+j*80);
+		}
+	}
+}
+
+void panic_cursor_off() {
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}
+
+void panic_dump_regs(int idx, regs_t* r) {
+	panic_print("Register Dump:", idx);
+	panic_print("EAX:", idx+84);
+	panic_print(HexToString(r->eax), idx+88);
+	panic_print("EBX:", idx+164);
+	panic_print(HexToString(r->ebx), idx+168);
+	panic_print("ECX:", idx+244);
+	panic_print(HexToString(r->ecx), idx+248);
+	panic_print("EDX:", idx+324);
+	panic_print(HexToString(r->edx), idx+328);
+
+	panic_print("ESP:", idx+484);
+	panic_print(HexToString(r->esp), idx+488);
+	panic_print("EBP:", idx+564);
+	panic_print(HexToString(r->ebp), idx+568);
+
+	panic_print("EIP:", idx+724);
+	panic_print(HexToString(r->eip), idx+728);
+}
+
+void panic_color(char color, int idx) {
+	((char*)0xB8000)[idx*2+1] = color;
+}
+
+void panic_bitmap(int idx, int* bitmap, int rows, int cols) {
+	for (int i = 0; i < rows; i++) {
+		int pix = bitmap[i];
+		int x = idx+i*80+cols;
+		for (int j = 0; j < cols; j++) {
+			if (pix&1) {
+				panic_color(0xff,x-j);
+			} else {
+                panic_color(0x99,x-j);
+            }
+			pix >>= 1;
+		}
+	}
+}
+
+int smiley[4] = {
+	0b10000001,
+	0b00000000,
+	0b01111110,
+	0b10000001
+};
+int smiley_width = 8;
+int smiley_heigth = 4;
+void kpanic(const char* message,regs_t* r) {
+    asm("cli");
+	panic_clear();
+	panic_print("Error: ", 20);
+	panic_print(message, 27);
+	panic_dump_regs(100, r);
+	panic_bitmap(325,smiley,smiley_heigth,smiley_width);
+	panic_print(" If you encounter this error",1200+80*6);
+	panic_print(" and you did not modify the code,",1280+80*6);
+	panic_print(" please report it to the author.",1360+80*6);
+	panic_print("   The System will now freeze ",522);
+	panic_print("      and you will have to    ",602);
+	panic_print("       reboot it manually.    ",682);
+	panic_print("Debug Scope: ", 1120+80*2+45);
+	panic_print(get_debug_location(),1120+80*2+45+13);
+	panic_cursor_off();
+	asm("hlt");
+	for (;;);
+}
+
 void test_vga() {
     clear_screen();
     print_string("VGA Test\n\r");
@@ -115,6 +211,35 @@ extern "C" {
     }
 }
 
+int memory_bmp[6] = {
+    0b1111111111111,
+    0b1000000000001,
+    0b1011100011101,
+    0b1011100011101,
+    0b1000000000001,
+    0b1011111111101
+};
+
+char zones[100];
+void memory_self_test() {
+    void* ptr = malloc(1);
+    int addr = (int)ptr;
+    free(ptr);
+    ptr = malloc(1);
+    if (((int)ptr)!=addr) {
+        regs_t* r = get_regs();
+        r->eax = addr;
+        r->ebx = (int)ptr;
+        r->ecx = sizeof(heap_segment_header);
+        r->edx = count_segments();
+        memcpy(smiley,memory_bmp,6*sizeof(int));
+        smiley_heigth = 6;
+        smiley_width = 13;
+        kpanic("Memory allocation failed",r);
+    }
+    free(ptr);
+}
+
 #include "cpuid.cpp"
 #include "kernel_shell.cpp"
 
@@ -126,7 +251,9 @@ void kernel_init() {
         init_paging(); // Initialize paging if its available
     }
     init_gdt(); // Initialize the GDT
-    init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
+    init_heap(0x100000, 0x200000);
+    memory_self_test(); // Run memory self-test.
+    //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     init_vga(); // Initialize VGA
     if (check_pge()) {
         print_string("[OK] Paging Enabled\n\r");

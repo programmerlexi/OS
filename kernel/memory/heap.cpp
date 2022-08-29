@@ -13,16 +13,45 @@ void init_heap(uint64_t heapAddress, size_t size) {
     first_free_segment->free = true;
 }
 
+int count_segments() {
+    heap_segment_header* segment = first_free_segment;
+    while (segment->prev != NULL) {
+        segment = segment->prev;
+    }
+    int i = 1;
+    while (segment->next) {
+        segment = segment->next;
+        i++;
+    }
+    return i;
+}
+
 void load_heap(heap_segment_header* first) {
     first_free_segment = first;
 }
 
+void combine_all_free_segments(int depth) {
+    if (depth == 0) {
+        return;
+    }
+    heap_segment_header* next = first_free_segment;
+    while (next->prev != NULL) {
+        next = next->prev;
+    }
+    while (next != NULL) {
+        combine_free_segments(next, next->next);
+        next = next->next;
+    }
+    combine_all_free_segments(depth-1);
+}
+
 void* malloc(size_t size) {
-    size_t remainder = size % 8;
+    /*size_t remainder = size % 8;
     size -= remainder;
     if (remainder != 0) {
         size += 8;
-    }
+    }*/ // screw performance this breaks the allocator
+    combine_all_free_segments(4);
     heap_segment_header* current = first_free_segment;
     while (true) {
         if (current->size >= size) {
@@ -126,6 +155,9 @@ void free(void* ptr) {
         current = (heap_segment_header*)((uint64_t)ptr - sizeof(heap_segment_header));
     }*/
     current = (heap_segment_header*)(((uint64_t)ptr) - sizeof(heap_segment_header));
+    while (first_free_segment->prev && first_free_segment->prev->free) {
+        first_free_segment = first_free_segment->prev;
+    }
     current->free = true;
     if (current < first_free_segment) {
         first_free_segment = current;
@@ -154,13 +186,7 @@ void free(void* ptr) {
     }
 }
 
-void combine_all_free_segments() {
-    heap_segment_header* next = first_free_segment;
-    while (next) {
-        combine_free_segments(next, next->next);
-        next = next->next;
-    }
-}
+
 
 /*void* alinged_alloc(uint64_t alingment, size_t size) {
     uint64_t alingment_remainder = alingment % 8;
