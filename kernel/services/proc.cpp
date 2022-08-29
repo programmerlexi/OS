@@ -70,6 +70,10 @@ void proc_create(void* loop_func, char* name) {
     newest_pid++;
 }
 
+void proc_create(void* loop_func, const char* name) {
+    proc_create(loop_func, (char*)name);
+}
+
 void proc_quit(int exit_code) {
     if (cur_pid >= newest_pid) {
         return;
@@ -85,6 +89,10 @@ int proc_fork(void* loop_func, char* name) {
     proc_create(loop_func, name);
     proc_list[newest_pid-1].parent_pid = proc_list[cur_pid].pid;
     return newest_pid-1;
+}
+
+int proc_fork(void* loop_func, const char* name) {
+    return proc_fork(loop_func, (char*)name);
 }
 
 void proc_wait() {

@@ -14,7 +14,7 @@ typedef struct program_info {
 } program_info;
 
 program_info* programs;
-uint32_t program_count;
+uint32_t program_count = 0;
 
 void add_program(program_info* info) {
     programs[program_count] = *info;
@@ -27,6 +27,10 @@ void build_program(void (*func)(), char* name, char* description) {
     info.name = name;
     info.description = description;
     add_program(&info);
+}
+
+void build_program(void (*func)(), const char* name, const char* description) {
+    build_program(func, (char*)name, (char*)description);
 }
 
 #include "shell/programs/builtins.cpp"

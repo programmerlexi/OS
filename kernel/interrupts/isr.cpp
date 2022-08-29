@@ -124,7 +124,7 @@ void panic_cursor_off() {
 	outb(0x3D5, 0x20);
 }
 
-void panic_dump_regs(int idx, regs* r) {
+void panic_dump_regs(int idx, regs_t* r) {
 	panic_print("Register Dump:", idx);
 	panic_print("EAX:", idx+84);
 	panic_print(HexToString(r->eax), idx+88);
@@ -168,7 +168,7 @@ int smiley[5] = {
 	0b10000001
 };
 
-extern "C" void _fault_handler(struct regs *r)
+extern "C" void _fault_handler(regs_t *r)
 {
     if (r->int_no < 32)
     {

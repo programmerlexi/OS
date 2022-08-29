@@ -200,7 +200,7 @@ static int check_tsc(void)
 
 static int check_fpu(void)
 {
-    unsigned int eax = 0, unused = 0, ecx = 0, edx = 0, ebx = 0;
+    unsigned int eax = 0, ecx = 0, edx = 0, ebx = 0;
     __get_cpuid(1, &eax, &ebx, &ecx, &edx);
     return edx & CPUID_FEAT_EDX_FPU;
 }
@@ -296,7 +296,7 @@ static const char* get_vendor(void) {
     } else if (strcmp(get_vendor_string(),CPUID_VENDOR_VORTEX)) {
         return "Vortex";
     } else {
-        char* result = malloc(strlen(get_vendor_string())+strlen("Unknown()"));
+        char* result = (char*)malloc(strlen(get_vendor_string())+strlen("Unknown()"));
         strcpy(result, "Unknown(",9);
         strcat(result, get_vendor_string(),strlen(get_vendor_string()));
         strcat(result, ")",1);
@@ -305,7 +305,7 @@ static const char* get_vendor(void) {
 }
 
 /* Intel Specific brand list */
-char *Intel[] = {
+const char *Intel[] = {
 	"Brand ID Not Supported.", 
 	"Intel(R) Celeron(R) processor", 
 	"Intel(R) Pentium(R) III processor", 
@@ -333,7 +333,7 @@ char *Intel[] = {
 };
 
 /* This table is for those brand strings that have two values depending on the processor signature. It should have the same number of entries as the above table. */
-char *Intel_Other[] = {
+const char *Intel_Other[] = {
 	"Reserved", 
 	"Reserved", 
 	"Reserved", 
@@ -642,8 +642,6 @@ int do_amd(void) {
 
 static void cpu_detect(void)
 {
-    int family = get_family();
-    int model = get_model();
     unsigned int unused = 0, ebx = 0, ecx = 0, edx = 0;
     __cpuid(0, unused, ebx, ecx, edx);
     switch (ebx) {

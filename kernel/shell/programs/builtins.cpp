@@ -3,7 +3,7 @@ void help() {
     print_string("user - prints the name of the current user.\n\r");
     print_string("shutdown - shuts down the computer.\n\r");
     print_string("exit - exits the shell.\n\r");
-    for (int i = 0; i < program_count; i++) {
+    for (uint32_t i = 0; i < program_count; i++) {
         print_string(programs[i].name);
         print_string(" - ");
         print_string(programs[i].description);
@@ -34,8 +34,7 @@ void clear() {
 }
 
 void crash() {
-    char i = 10/0;
-    print_char(i);
+    *((uint8_t*)0xffffffff) = 1;
 }
 
 void cpu_info() {

@@ -19,6 +19,9 @@ void procs() {
             case PROC_WAITING:
                 print_string("WAITING");
                 break;
+            case PROC_DEAD:
+                print_string("DEAD");
+                break;
         }
         print_string("\n\r");
     }

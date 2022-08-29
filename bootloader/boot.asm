@@ -18,7 +18,7 @@ main:
     
 
     mov bx, KERNEL_LOCATION
-    mov dh, 67
+    mov dh, 70
 
     mov ah, 0x02
     mov al, dh 

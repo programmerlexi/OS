@@ -5,58 +5,43 @@ extern void _syscall();
 #include <stdint.h>
 #include "../services/proc.h"
 
-void down(regs* r) {
+regs_t* disregard_regs(regs_t* r) {
+    return r;
+} // Just error handling. Make a call to this function with the regs pointer that you dont want to use.
+
+void down(regs_t* r) {
+    disregard_regs(r);
     power_shutdown();
 }
-void fork(regs* r) {
+void fork(regs_t* r) {
+    disregard_regs(r);
     proc_fork(proc_list[cur_pid].loop, proc_list[cur_pid].name);
 }
-void exec(regs* r) {
+void exec(regs_t* r) {
     proc_quit(0);
     proc_create((void*)r->eax, (char*)r->ebx);
 }
-void exit(regs* r) {
+void exit(regs_t* r) {
     proc_quit(r->eax);
 }
-void time(regs* r) {
+void time(regs_t* r) {
     read_rtc();
     r->eax = second;
     r->ebx = minute;
     r->ecx = hour;
 }
-void date(regs* r) {
+void date(regs_t* r) {
     read_rtc();
     r->eax = day;
     r->ebx = month;
     r->ecx = year;
 }
-void sys_6(regs* r) {
-}
-void sys_7(regs* r) {
-}
-void sys_8(regs* r) {
-}
-void sys_9(regs* r) {
-}
-void sys_10(regs* r) {
+void sys_clear(regs_t* r) {
+    disregard_regs(r);
     clear_screen();
 }
-void sys_11(regs* r) {
-}
-void sys_12(regs* r) {
-}
-void sys_13(regs* r) {
-}
-void sys_14(regs* r) {
-}
-void sys_15(regs* r) {
-}
-void sys_16(regs* r) {
-}
-void sys_17(regs* r) {
-}
-
-void sys_undefined(regs* r) {
+void sys_undefined(regs_t* r) {
+    disregard_regs(r);
 }
 
 void sys_init(){
@@ -72,18 +57,7 @@ void syscall_c(regs* r){
         case 0x03: exit(r); break;
         case 0x04: time(r); break;
         case 0x05: date(r); break;
-        case 0x06: sys_6(r); break;
-        case 0x07: sys_7(r); break;
-        case 0x08: sys_8(r); break;
-        case 0x09: sys_9(r); break;
-        case 0x0A: sys_10(r); break;
-        case 0x0B: sys_11(r); break;
-        case 0x0C: sys_12(r); break;
-        case 0x0D: sys_13(r); break;
-        case 0x0E: sys_14(r); break;
-        case 0x0F: sys_15(r); break;
-        case 0x10: sys_16(r); break;
-        case 0x11: sys_17(r); break;
+        case 0x0A: sys_clear(r); break;
         default: sys_undefined(r); break;
     }
 }

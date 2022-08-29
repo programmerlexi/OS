@@ -24,8 +24,10 @@ struct Process {
 
 void kernel_loop();
 void proc_create(void* loop_func,char*);
+void proc_create(void* loop_func,const char*);
 void proc_quit(int exit_code);
-int proc_fork(void* loop_func,char*);
+int proc_fork(void* loop_func,char* name);
+int proc_fork(void* loop_func,const char* name);
 void proc_cycle();
 void proc_init();
 void proc_wait();

@@ -8,7 +8,7 @@ void handle_ps2_mouse_data(uint8_t data) {
     switch (mouse_cycle) {
         case 0:
             if (mouse_packet_ready) break;
-            if (data & 0b00001000 == 0) break; // something went wrong with the data transfer
+            if ((data & 0b00001000) == 0) break; // something went wrong with the data transfer
             mouse_packet[0] = data;
             mouse_cycle++;
             return;
@@ -131,6 +131,7 @@ void process_mouse_packet() {
 }
 
 void mouse_handler(struct regs *r) {
+    disregard_regs(r);
     uint8_t mouseData = mouse_read();//inb(0x60);
     handle_ps2_mouse_data(mouseData);
     //print_string("m");

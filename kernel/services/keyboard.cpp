@@ -3,6 +3,7 @@
 #include "pic.h"
 void keyboard_handler(struct regs *r)
 {
+    disregard_regs(r);
     unsigned char scancode;
 
     scancode = inb(DATA_PORT);

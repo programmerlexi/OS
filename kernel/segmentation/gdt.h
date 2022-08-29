@@ -55,11 +55,11 @@ typedef enum
 } GDT_FLAGS;
 
 // Helper macros
-#define GDT_LIMIT_LOW(limit)                ((uint8_t)(limit & 0xFFFF))
-#define GDT_BASE_LOW(base)                  (base & 0xFFFF)
-#define GDT_BASE_MIDDLE(base)               ((base >> 16) & 0xFF)
-#define GDT_FLAGS_LIMIT_HI(limit, flags)    (((limit >> 16) & 0xF) | (flags & 0xF0))
-#define GDT_BASE_HIGH(base)                 ((base >> 24) & 0xFF)
+#define GDT_LIMIT_LOW(limit)                (((uint16_t)(limit & 0xFFFF)))
+#define GDT_BASE_LOW(base)                  (((uint16_t)(base & 0xFFFF)))
+#define GDT_BASE_MIDDLE(base)               (((uint8_t)((base >> 16) & 0xFF)))
+#define GDT_FLAGS_LIMIT_HI(limit, flags)    (((uint8_t)(((uint8_t)((limit >> 16) & 0xF)) | ((uint8_t)(flags & 0xF0)))))
+#define GDT_BASE_HIGH(base)                 (((uint8_t)((base >> 24) & 0xFF)))
 
 #define GDT_ENTRY(base, limit, access, flags) {                     \
     GDT_LIMIT_LOW(limit),                                           \

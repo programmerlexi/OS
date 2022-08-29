@@ -118,6 +118,8 @@ extern "C" {
 #include "cpuid.cpp"
 #include "kernel_shell.cpp"
 
+void verify_kernel();
+
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
     if (check_pge()) {
@@ -129,6 +131,7 @@ void kernel_init() {
     if (check_pge()) {
         print_string("[OK] Paging Enabled\n\r");
     }
+    verify_kernel();
     print_string("Initializing processes!\r");
     proc_init(); // Initialize processses
     print_string("[OK] Processes initialized!\n\r");
@@ -208,3 +211,6 @@ extern "C" void main(){
     return;
 }
 #include "klib.cpp"
+void verify_kernel(void) {
+    print_string("Verified that kernel is fully loaded!\n\r");
+}
