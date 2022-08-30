@@ -47,6 +47,7 @@ void load_programs() {
     build_program(crash,"crash","crashes the system");
     build_program(memory,"memory","prints the used heap memory");
     build_program(read_sector_one, "sector", "prints the first sector");
+    build_program(reboot,"reboot","reboot the system");
 }
 
 int sub_pid;

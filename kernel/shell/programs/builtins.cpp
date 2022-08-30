@@ -52,6 +52,10 @@ void read_sector_one() {
     proc_quit(0);
 }
 
+void reboot() {
+    power_restart();
+}
+
 void memory() {
     heap_segment_header* segment = first_free_segment;
     while(1) {

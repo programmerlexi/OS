@@ -39,10 +39,6 @@ bootloader: setup
 
 image: bootloader kernel setup
 	echo "Generating image"
-#dd if=/dev/zero of=images/OS.img bs=512 count=2880
-#mkfs.fat -F 12 -n "OS" images/OS.img
-#dd if=bins/boot.bin of=images/OS.img conv=notrunc
-#mcopy -i images/OS.img bins/full_kernel.bin "::kernel.bin"
 	cat bins/boot.bin bins/stage2.bin bins/full_kernel.bin bins/zeroes.bin  > images/OS.bin
 
 iso: image
