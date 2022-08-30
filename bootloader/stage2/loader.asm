@@ -1,5 +1,5 @@
 bits 16
-KERNEL_LOCATION equ 0x00007ef0 ; we dont need stage 1 anyway
+KERNEL_LOCATION equ 0x00007ef0
 stage2:
     xor ax, ax                          
     mov es, ax
