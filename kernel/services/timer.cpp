@@ -29,11 +29,12 @@ void timer_handler(struct regs *r)
     }
 }
 
-void sleep(int time_to_wait_seconds) {
-    int start = seconds;
-    while (seconds < time_to_wait_seconds + start) {
-        
+void sleep (int ticks){
+    int startTicks = timer_ticks;
+    while(timer_ticks < startTicks + ticks){
+        asm("nop");
     }
+    return;
 }
 
 void timer_install()

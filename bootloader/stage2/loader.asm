@@ -26,7 +26,7 @@ stage2:
 [global load_kernel_from_disk]
 load_kernel_from_disk:
     mov bx, KERNEL_LOCATION
-    mov dh, 66
+    mov dh, 75
 
     mov ah, 0x02
     mov al, dh 
@@ -47,9 +47,6 @@ after_load:
     ret
 [global load_gdt]
 load_gdt:
-    mov ah, 0x0
-    mov al, 0x14
-    int 0x10
     cli
     lgdt [GDT_descriptor]
     ret

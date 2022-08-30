@@ -46,6 +46,7 @@ void load_programs() {
     build_program(date,"date","prints the current date");
     build_program(crash,"crash","crashes the system");
     build_program(memory,"memory","prints the used heap memory");
+    build_program(read_sector_one, "sector", "prints the first sector");
 }
 
 int sub_pid;

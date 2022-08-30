@@ -40,6 +40,18 @@ void crash() {
     *((uint8_t*)0xffffffff) = 1;
 }
 
+void read_sector_one() {
+    print_string("Reading first sector\n\r");
+    uint8_t* buf = (uint8_t*)LBA28_read_sectors(get_boot_info()->disk,0,1);
+    for (uint32_t i = 0; i < 512; i++) {
+        putchar(buf[i],color(DARK_GRAY,0xf),index(vga_pos));
+        vga_pos++;
+        swap_buffers();
+    }
+    print_string("\n\r");
+    proc_quit(0);
+}
+
 void memory() {
     heap_segment_header* segment = first_free_segment;
     while(1) {

@@ -1,9 +1,4 @@
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DRQ      0x08
-#define STATUS_DF       0x20
-#define STATUS_ERR      0x01
-
+#include "disk.h"
 void identify_ata(uint8_t drive) {
     // 0xA0 for Master
 	// 0xB0 for Slave
@@ -51,7 +46,7 @@ void wait_DRQ(){
 	while(!(inb(0x1F7) & STATUS_RDY));
 }
 
-void LBA28_read_sectors(uint8_t drive, uint32_t LBA, uint8_t sector) {
+uint16_t* LBA28_read_sectors(uint8_t drive, uint32_t LBA, uint8_t sector) {
     wait_BSY();
     outb(0x1F6, drive | ((LBA >> 24) & 0xF));
 	outb(0x1F1, 0x00);
@@ -69,5 +64,27 @@ void LBA28_read_sectors(uint8_t drive, uint32_t LBA, uint8_t sector) {
         }
         addr += 256;
     }
-    print_string(HexToString((uint32_t) addr));
+    return (uint16_t*) addr;
+}
+
+void LBA28_write_sectors(uint8_t drive, uint32_t LBA, uint32_t sector, uint32_t *buffer) {
+    wait_BSY();
+    outb(0x1F6, drive | ((LBA >> 24) & 0xF));
+    outb(0x1F1, 0x00);
+	outb(0x1F2, sector);
+	outb(0x1F3, (uint8_t) LBA);
+	outb(0x1F4, (uint8_t) (LBA >> 8));
+	outb(0x1F5, (uint8_t) (LBA >> 16)); 
+	outb(0x1F7,0x30); // 0x30 = 'Write' Command
+    for (int j = 0; j < sector; j++){
+		wait_BSY();
+		wait_DRQ();
+
+		for(int i = 0; i < 256; i++){
+			outl(0x1F0, buffer[i]);
+		}
+
+		outb(0x1F7, 0xE7);
+		sleep(1);
+	}
 }

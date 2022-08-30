@@ -25,7 +25,7 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "services/mouse.cpp"
 #include "paging/paging.cpp"
 }
-
+#include "disk/disk.cpp"
 #include "ring3/tss.cpp"
 #include "segmentation/gdt.cpp"
 

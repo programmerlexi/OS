@@ -34,6 +34,7 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "paging/paging.h"
 #include "ring3/umode.h"
 }
+#include "disk/disk.h"
 #include "ring3/tss.h"
 #include "segmentation/gdt.h"
 
@@ -319,6 +320,8 @@ void kernel_init() {
     asm volatile("sti"); // Enable interrupt
     print_string("Performing Timer Self Test!\n\r");
     timer_self_test();
+    print_string("Identifying Master ATA.\n\r");
+    identify_ata(0xA0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
     exit_debug_scope();
