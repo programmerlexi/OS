@@ -3,9 +3,11 @@
 void power_shutdown() {
     clear_screen();
     print_string("Shutting down...\n\r");
-    asm("cli");
-    outw((uint16_t)0x604, (uint16_t)0x2000);
-    asm("hlt");
+    asm("cli"); // Disable interrupts
+    outw(0xB004, 0x2000); // Tell Bochs and older versions of QEMU to shutdown
+    outw(0x4004, 0x3400); // Tell VirtualBox to shutdown
+    outw((uint16_t)0x604, (uint16_t)0x2000); // Tell QEMU to shutdown
+    while (1) asm("hlt"); // Halt the cpu
 }
 
 void power_restart() {
