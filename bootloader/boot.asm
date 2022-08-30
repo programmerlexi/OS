@@ -6,7 +6,7 @@ main:
     xor ax, ax                          
     mov es, ax
     mov ds, ax
-    mov sp, 0x7c00 ; Does the stack work with out a base address? YES.
+    mov sp, 0x7c00 ; Does the stack work with out a base address? YES IT DOES!
     
     ;clear the screen
 	mov ah, 0x00
@@ -259,7 +259,7 @@ start_protected_mode:
 	mov ebp, 0xf0000 ; maximum stack size
 	mov esp, ebp
 
-    ; print an "A"
+    ; print an "A" to indicate that we have reached Protected Mode
     mov ah, 0x0f ; bg=black fg=white
     mov al, 'A'
     mov [0xb80000], ax

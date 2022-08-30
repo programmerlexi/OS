@@ -36,6 +36,7 @@ heap_segment_header* get_new_segment(heap_segment_header* ptr, uint64_t offset,s
     segment->next = ptr->next;
     segment->prev = ptr;
     segment->free = true;
+    ptr->next->prev = segment;
     ptr->next = segment;
     return segment;
 }
@@ -92,10 +93,12 @@ void combine_free_segments(heap_segment_header* a, heap_segment_header* b) {
     if (a < b) {
         if (((size_t)a->next)!=(size_t)b || ((size_t)b->prev)!=(size_t)a) return;
         a->next = b->next;
+        if (b->next) b->next->prev = a;
         a->size += b->size+sizeof(heap_segment_header);
     } else if (b < a) {
         if (((size_t)b->next)!=(size_t)a || ((size_t)a->prev)!=(size_t)b)return;
         b->next = a->next;
+        if (a->next) a->next->prev = b;
         b->size += a->size+sizeof(heap_segment_header);
     }
 }

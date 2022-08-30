@@ -168,6 +168,7 @@ void terminal_loop() {
                     print_string("Type 'help' for a list of commands.\n\r");
                     printed = false;
                 }
+                free(input);
             } else {
                 printed = false;
             }

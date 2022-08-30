@@ -38,12 +38,7 @@ void proc_cycle() {
                 proc_list[i].state = PROC_RUNNING;
                 proc_lock();
                 char* name = proc_list[i].name;
-                char* pid = num_to_char(proc_list[i].pid);
-                char* debug = (char*)malloc(strlen(name) + strlen(pid) + strlen(" | "));
-                strcpy(debug, name, strlen(name));
-                strcat(debug, " | ", 3);
-                strcat(debug, pid, strlen(pid));
-                enter_debug_scope(debug);
+                enter_debug_scope(name);
                 ((void(*)())proc_list[i].loop)();
                 exit_debug_scope();
                 proc_unlock();

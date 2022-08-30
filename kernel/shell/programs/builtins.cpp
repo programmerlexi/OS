@@ -42,25 +42,41 @@ void crash() {
 
 void memory() {
     heap_segment_header* segment = first_free_segment;
-    while(segment->next) {
+    while(1) {
         /*if (segment->free) {
             print_string("F");
         } else {
             print_string("U");
         }*/
-        print_string(HexToString(segment+sizeof(heap_segment_header)));
+        print_string(HexToString((uint64_t)segment));
         print_string(" ");
-        print_string(HexToString(segment->size));
+        print_string(HexToString((uint64_t)segment->size));
         print_string(" ");
         if (segment->free) {
             print_string("Free");
         } else {
             print_string("Used");
         }
+        print_string(" ");
+        print_string(HexToString((uint64_t)segment->next));
+        print_string(" ");
+        print_string(HexToString((uint64_t)segment->prev));
         print_string("\n\r");
         segment = segment->next;
+        if (segment == NULL) break;
     }
-    print_string("\n\r");
+    int i = 0;
+    segment = first_free_segment;
+    while (1) {
+        if (segment->free) i++;
+        segment = segment->next;
+        if (segment == NULL) break;
+    }
+    print_string(HexToString((uint64_t)i));
+    print_string(" segment(s) of ");
+    print_string(HexToString((uint64_t)count_segments()));
+    print_string(" segment(s) are free\n\r");
+    //print_string("\n\r");
     proc_quit(0);
 }
 

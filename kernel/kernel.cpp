@@ -211,7 +211,7 @@ int memory_bmp[8] = {
     0b1111111111111
 };
 
-void* zones[100];
+uint64_t zones[100];
 void memory_self_test() {
     void* ptr = malloc(1);
     int addr = (int)ptr;
@@ -231,16 +231,16 @@ void memory_self_test() {
     }
     free(ptr);
     for (int i = 0; i < 100; i++) {
-        zones[i] = malloc(1);
+        zones[i] = (uint64_t)malloc(1);
     }
     for (int i = 0; i < 100; i++) {
         if (!(i % 2)) {
-            free(zones[i]);
+            free((void*)zones[i]);
         }
     }
     for (int i = 0; i < 100; i++) {
         if ((i & 1)) {
-            free(zones[i]);
+            free((void*)zones[i]);
         }
     }
     ptr = malloc(100);
