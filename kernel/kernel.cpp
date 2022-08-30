@@ -134,7 +134,10 @@ void kpanic(const char* message,regs_t* r) {
 	panic_print("Debug Scope: ", 1120+80*2+45);
 	panic_print(get_debug_location(),1120+80*2+45+13);
 	panic_cursor_off();
-	asm("hlt");
+    /*for (int i = 0; i < 0xeeeeef*10;i++) {
+        asm("nop");
+    }*/ // kpanic is useful for debugging too
+    asm("hlt");
 	for (;;);
 }
 
@@ -174,20 +177,6 @@ void test_memory() {
 
     free(t4);
 
-    void* t5 = calloc(0x10);
-
-    print_string("\n\rt5: ");
-    str = HexToString((uint64_t)t5);
-    print_string(str);
-
-    t5 = realloc(t5, 0x60);
-
-    print_string("\n\rt5 (reallocated): ");
-    str = HexToString((uint64_t)t5);
-    print_string(str);
-
-    free(t5);
-
     print_string("\n\n\r");
 }
 
@@ -211,16 +200,18 @@ extern "C" {
     }
 }
 
-int memory_bmp[6] = {
+int memory_bmp[8] = {
     0b1111111111111,
     0b1000000000001,
     0b1011100011101,
     0b1011100011101,
     0b1000000000001,
-    0b1011111111101
+    0b1011111111101,
+    0b1000000000001,
+    0b1111111111111
 };
 
-char zones[100];
+void* zones[100];
 void memory_self_test() {
     void* ptr = malloc(1);
     int addr = (int)ptr;
@@ -232,10 +223,34 @@ void memory_self_test() {
         r->ebx = (int)ptr;
         r->ecx = sizeof(heap_segment_header);
         r->edx = count_segments();
-        memcpy(smiley,memory_bmp,6*sizeof(int));
-        smiley_heigth = 6;
+        r->esp = (int)first_free_segment;
+        memcpy(smiley,memory_bmp,8*sizeof(int));
+        smiley_heigth = 8;
         smiley_width = 13;
-        kpanic("Memory allocation failed",r);
+        kpanic("Memory freeing failed",r);
+    }
+    free(ptr);
+    for (int i = 0; i < 100; i++) {
+        zones[i] = malloc(1);
+    }
+    for (int i = 0; i < 100; i++) {
+        if (!(i % 2)) {
+            free(zones[i]);
+        }
+    }
+    for (int i = 0; i < 100; i++) {
+        if ((i & 1)) {
+            free(zones[i]);
+        }
+    }
+    ptr = malloc(100);
+    if (((int)ptr)!=addr) {
+        regs_t* r = get_regs();
+        r->eax = (int)ptr;
+        memcpy(smiley,memory_bmp,8*sizeof(int));
+        smiley_heigth = 8;
+        smiley_width = 13;
+        kpanic("Memory combination failed",r);
     }
     free(ptr);
 }

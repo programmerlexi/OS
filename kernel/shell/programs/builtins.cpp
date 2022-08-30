@@ -40,6 +40,30 @@ void crash() {
     *((uint8_t*)0xffffffff) = 1;
 }
 
+void memory() {
+    heap_segment_header* segment = first_free_segment;
+    while(segment->next) {
+        /*if (segment->free) {
+            print_string("F");
+        } else {
+            print_string("U");
+        }*/
+        print_string(HexToString(segment+sizeof(heap_segment_header)));
+        print_string(" ");
+        print_string(HexToString(segment->size));
+        print_string(" ");
+        if (segment->free) {
+            print_string("Free");
+        } else {
+            print_string("Used");
+        }
+        print_string("\n\r");
+        segment = segment->next;
+    }
+    print_string("\n\r");
+    proc_quit(0);
+}
+
 void cpu_info() {
     print_string("CPU Vendor: ");
     print_string(get_vendor());

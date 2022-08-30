@@ -8,8 +8,6 @@ void init_heap(uint64_t heapAddress, size_t size) {
     first_free_segment->size = size;
     first_free_segment->next = NULL;
     first_free_segment->prev = NULL;
-    first_free_segment->nextFree = NULL;
-    first_free_segment->prevFree = NULL;
     first_free_segment->free = true;
 }
 
@@ -30,187 +28,81 @@ void load_heap(heap_segment_header* first) {
     first_free_segment = first;
 }
 
-void combine_all_free_segments(int depth) {
-    if (depth == 0) {
-        return;
-    }
-    heap_segment_header* next = first_free_segment;
-    while (next->prev != NULL) {
-        next = next->prev;
-    }
-    while (next != NULL) {
-        combine_free_segments(next, next->next);
-        next = next->next;
-    }
-    combine_all_free_segments(depth-1);
+heap_segment_header* get_new_segment(heap_segment_header* ptr, uint64_t offset,size_t size) {
+    uint64_t addr = (uint64_t)ptr;
+    addr += offset;
+    heap_segment_header* segment = (heap_segment_header*)addr;
+    segment->size = size;
+    segment->next = ptr->next;
+    segment->prev = ptr;
+    segment->free = true;
+    ptr->next = segment;
+    return segment;
+}
+
+heap_segment_header* get_header_of_ptr(void* ptr) {
+    uint64_t addr = (uint64_t)ptr;
+    addr -= sizeof(heap_segment_header);
+    return (heap_segment_header*)addr;
+}
+
+void* get_ptr_from_header(heap_segment_header* header) {
+    uint64_t addr = (uint64_t)header;
+    addr += sizeof(heap_segment_header);
+    return (void*)addr;
 }
 
 void* malloc(size_t size) {
-    /*size_t remainder = size % 8;
-    size -= remainder;
-    if (remainder != 0) {
-        size += 8;
-    }*/ // screw performance this breaks the allocator
-    combine_all_free_segments(4);
-    heap_segment_header* current = first_free_segment;
-    while (true) {
-        if (current->size >= size) {
-            if (current->size > size + sizeof(heap_segment_header)) {
-                heap_segment_header* new_segment = (heap_segment_header*)((uint64_t)current + sizeof(heap_segment_header) + size);
-                new_segment->free = true;
-                new_segment->size = current->size - size - sizeof(heap_segment_header);
-                new_segment->next = current->next;
-                new_segment->prev = current;
-                new_segment->nextFree = current->nextFree;
-                new_segment->prevFree = current->prevFree;
-
-                current->next = new_segment;
-                current->nextFree = new_segment;
-                current->size = size;
+    heap_segment_header* segment = first_free_segment;
+    if (segment->size == 0) {
+        regs_t* r = get_regs();
+        r->eax = (int)segment;
+        kpanic("NULL Segment as first free segment",r);
+    }
+    while (1) {
+        if (segment->free) {
+            if (segment->size >= size) {
+                if (segment->size > size+sizeof(heap_segment_header)*2) {
+                    heap_segment_header* new_segment = get_new_segment(segment,size+sizeof(heap_segment_header),segment->size-size);
+                }
+                segment->free = false;
+                return get_ptr_from_header(segment);
             }
-            if (current == first_free_segment) {
-                first_free_segment = current->next;
-            }
-            current->free = false;
-            if (current->prevFree != NULL) {
-                current->prevFree->nextFree = current->nextFree;
-            }
-            if (current->nextFree != NULL) {
-                current->nextFree->prevFree = current->prevFree;
-            }
-            if (current->prev != NULL) {
-                current->prev->nextFree = current->nextFree;
-            }
-            if (current->next != NULL) {
-                current->next->prevFree = current->prevFree;
-            }
-            return current+sizeof(heap_segment_header);
         }
-        if (current->nextFree == NULL) {
+        if (segment->next == NULL) {
             return NULL;
         }
-        current = current->nextFree;
+        segment = segment->next;
     }
     return NULL;
 }
 
-void* calloc(size_t size) {
-    void* ptr = malloc(size);
-    if (ptr == NULL) {
-        return NULL;
-    }
-    memset(ptr, 0, size);
+void* calloc(uint64_t num, size_t size) {
+    uint8_t* ptr = (uint8_t*)malloc(size);
+    memset(ptr, num, size);
     return ptr;
 }
-
-void* calloc(uint64_t num, size_t size) {
-    return calloc(num*size);
-}
-
-void* realloc(void* ptr, size_t newSize) {
-    heap_segment_header* old = (heap_segment_header*)ptr - sizeof(heap_segment_header);
-    if (old->free) {
-        return NULL;
-    }
-    uint64_t smallerSize = newSize;
-    if (old->size < newSize) {
-        smallerSize = old->size;
-    }
-    void* newPtr = malloc(newSize);
-    memcpy(newPtr, ptr, smallerSize);
-    free(ptr);
-    return newPtr;
+void* calloc(size_t size) {
+    return calloc(0, size);
 }
 
 void combine_free_segments(heap_segment_header* a, heap_segment_header* b) {
-    if (a == NULL || b == NULL) {
-        return;
-    }
-    if (!a->free || !b->free) {
-        return;
-    }
+    if (a==NULL || b==NULL) return;
+    if (!a->free || !b->free) return;
     if (a < b) {
-        a->size += b->size + sizeof(heap_segment_header);
+        if (((size_t)a->next)!=(size_t)b || ((size_t)b->prev)!=(size_t)a) return;
         a->next = b->next;
-        a->nextFree = b->nextFree;
-        b->next->prev = a;
-        b->next->prevFree = a;
-        b->nextFree->prevFree = a;
-    } else {
-        b->size += a->size + sizeof(heap_segment_header);
+        a->size += b->size+sizeof(heap_segment_header);
+    } else if (b < a) {
+        if (((size_t)b->next)!=(size_t)a || ((size_t)a->prev)!=(size_t)b)return;
         b->next = a->next;
-        b->nextFree = a->nextFree;
-        a->next->prev = b;
-        a->next->prevFree = b;
-        a->nextFree->prevFree = b;
+        b->size += a->size+sizeof(heap_segment_header);
     }
 }
 
 void free(void* ptr) {
-    heap_segment_header* current;
-    /*alinged_heap_segment_header* ahsh;
-    if (ahsh->isAlinged) {
-        current = (heap_segment_header*)(ahsh->segment_header_address);
-    } else {
-        current = (heap_segment_header*)((uint64_t)ptr - sizeof(heap_segment_header));
-    }*/
-    current = (heap_segment_header*)(((uint64_t)ptr) - sizeof(heap_segment_header));
-    while (first_free_segment->prev && first_free_segment->prev->free) {
-        first_free_segment = first_free_segment->prev;
-    }
-    current->free = true;
-    if (current < first_free_segment) {
-        first_free_segment = current;
-    }
-    if (current->nextFree != NULL) {
-        if (current->nextFree->prevFree < current) {
-            current->nextFree->prevFree = current;
-        }
-    }
-    if (current->prevFree != NULL) {
-        if (current->prevFree->nextFree > current) {
-            current->prevFree->nextFree = current;
-        }
-    }
-    if (current->next != NULL) {
-        current->next->prev = current;
-        if (current->next->free) {
-            combine_free_segments(current, current->next);
-        }
-    }
-    if (current->prev != NULL) {
-        current->prev->next = current;
-        if (current->prev->free) {
-            combine_free_segments(current, current->prev);
-        }
-    }
+    heap_segment_header* segment = get_header_of_ptr(ptr);
+    segment->free = true;
+    if (segment->next != NULL) combine_free_segments(segment, segment->next);
+    if (segment->prev != NULL) combine_free_segments(segment->prev, segment);
 }
-
-
-
-/*void* alinged_alloc(uint64_t alingment, size_t size) {
-    uint64_t alingment_remainder = alingment % 8;
-    alingment -= alingment_remainder;
-    if (alingment_remainder != 0) {
-        alingment += 8;
-    }
-    size_t size_remainder = size % 8;
-    size -= size_remainder;
-    if (size_remainder != 0) {
-        size += 8;
-    }
-    uint64_t totalSize = size + alingment;
-    void* result = malloc(totalSize);
-    uint64_t address = (uint64_t)result;
-
-    uint64_t remainder = address % alingment;
-    address -= remainder;
-    if (remainder != 0) {
-        address += alingment;
-
-        alinged_heap_segment_header* alhs = (alinged_heap_segment_header*)address- sizeof(heap_segment_header);
-        alhs->isAlinged = true;
-        alhs->segment_header_address = (uint64_t)result - sizeof(heap_segment_header);
-    }
-    return (void*)address;
-}*/

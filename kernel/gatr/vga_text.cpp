@@ -44,9 +44,9 @@ unsigned int index(unsigned int char_index) {
 }
 
 void scroll_down() {
-    memcpy((uint8_t*)vgaBackBuffer, (uint8_t*)(vgaBackBuffer + VGA_WIDTH*2), VGA_HEIGHT*(VGA_WIDTH*2));
-    memset((uint8_t*)(vgaBackBuffer-VGA_WIDTH*2), 0, VGA_WIDTH*2);
-    vga_pos -= VGA_WIDTH;
+    memcpy((uint8_t*)vgaBackBuffer, (uint8_t*)(vgaBackBuffer + VGA_WIDTH*2), (VGA_HEIGHT-1)*(VGA_WIDTH*2));
+    memset((uint8_t*)(vgaBackBuffer+((VGA_HEIGHT-1)*(VGA_WIDTH*2))), 0, VGA_WIDTH*2);
+    vga_pos -= (int)vga_pos % 80;
 }
 
 void clear_screen() {

@@ -1,7 +1,7 @@
 #include "regs.h"
 void fill_reg(struct regs *reg) {
-    uint32_t eaxres, ebxres, ecxres, edxres;
-    uint32_t espres, ebpres, esires;
+    uint32_t eaxres, ebxres, ecxres, edxres = 0;
+    uint32_t espres, ebpres, esires = 0;
     asm("movl\t%%eax, %0" : "=m" (eaxres));
     asm("movl\t%%ebx, %0" : "=m" (ebxres));
     asm("movl\t%%ecx, %0" : "=m" (ecxres));
@@ -20,6 +20,7 @@ void fill_reg(struct regs *reg) {
 
 regs_t* get_regs() {
     regs_t* regs = (regs_t*)0x2000;
+    memset(regs, 0, sizeof(regs_t));
     fill_reg(regs);
     return regs;
 }
