@@ -11,7 +11,7 @@ void timer_phase(int hz)
 
 void timer_handler(struct regs *r)
 {
-    set_kernel_stack(r->esp);
+    //set_kernel_stack(r->esp);
     /* Increment our 'tick count' */
     timer_ticks++;
     swap_buffers();

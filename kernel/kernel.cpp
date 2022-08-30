@@ -200,7 +200,7 @@ extern "C" {
     }
 }
 
-int memory_bmp[8] = {
+int robot_bmp[8] = {
     0b1111111111111,
     0b1000000000001,
     0b1011100011101,
@@ -224,7 +224,7 @@ void memory_self_test() {
         r->ecx = sizeof(heap_segment_header);
         r->edx = count_segments();
         r->esp = (int)first_free_segment;
-        memcpy(smiley,memory_bmp,8*sizeof(int));
+        memcpy(smiley,robot_bmp,8*sizeof(int));
         smiley_heigth = 8;
         smiley_width = 13;
         kpanic("Memory freeing failed",r);
@@ -247,12 +247,29 @@ void memory_self_test() {
     if (((int)ptr)!=addr) {
         regs_t* r = get_regs();
         r->eax = (int)ptr;
-        memcpy(smiley,memory_bmp,8*sizeof(int));
+        memcpy(smiley,robot_bmp,8*sizeof(int));
         smiley_heigth = 8;
         smiley_width = 13;
         kpanic("Memory combination failed",r);
     }
     free(ptr);
+}
+
+void timer_self_test() {
+    timer_ticks = 0;
+    int i = 0xfffffff;
+    while (timer_ticks == 0) {
+        asm("nop");
+        i--;
+        if (i <= 0) {
+            regs_t* r = get_regs();
+            r->eax = timer_ticks;
+            memcpy(smiley,robot_bmp,8*sizeof(int));
+            smiley_heigth = 8;
+            smiley_width = 13;
+            kpanic("Timer is not responding after 0xfffffff probes",r);
+        }
+    }
 }
 
 #include "cpuid.cpp"
@@ -300,6 +317,8 @@ void kernel_init() {
     proc_create((void*)process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
     print_string("[OK] Mouse installed!\n\r");
     asm volatile("sti"); // Enable interrupt
+    print_string("Performing Timer Self Test!\n\r");
+    timer_self_test();
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
     exit_debug_scope();
