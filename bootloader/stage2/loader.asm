@@ -1,5 +1,5 @@
 bits 16
-KERNEL_LOCATION equ 0x00007ef0
+KERNEL_LOCATION equ 0x00007ef0 ; we dont need stage 1 anyway
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -20,25 +20,48 @@ stage2:
     mov bx, finished_memory
     call print_string
 
-
-    
     [extern loader_c]
     call loader_c
-    
+
+[global load_kernel_from_disk]
+load_kernel_from_disk:
     mov bx, KERNEL_LOCATION
     mov dh, 66
 
-    mov ah, 0x04
+    mov ah, 0x02
     mov al, dh 
     mov ch, 0x00
     mov dh, 0x00
-    mov cl, 0x02
+    mov cl, 0x06
     mov dl, [0x5004]
     int 0x13
     jnc after_load
     mov ah, 0x0e
     mov bx, failed_disk
     call print_string
+    jmp $
+after_load:
+    mov ah, 0x0e
+    mov bx, good
+    call print_string
+    ret
+[global load_gdt]
+load_gdt:
+    mov ah, 0x0
+    mov al, 0x14
+    int 0x10
+    cli
+    lgdt [GDT_descriptor]
+    ret
+[global set_protected_mode]
+set_protected_mode:
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+    ret
+[global jump_to_protected_mode]
+jump_to_protected_mode:
+    jmp CODE_SEG:start_protected_mode
     jmp $
 memory_detection:
     clc
@@ -73,25 +96,7 @@ failed_memory:
     call print_string
     jmp $
 
-after_load:
-    call enableA20
 
-    mov ah, 0x0e
-    mov bx, good
-    call print_string
-
-    mov ah, 0x0
-    mov al, 0x14
-    int 0x10
-    cli
-    lgdt [GDT_descriptor]
-    
-    mov eax, cr0
-    or eax, 1
-    mov cr0, eax
-    
-    jmp CODE_SEG:start_protected_mode
-    jmp $
 
 print_string:
     mov al, [bx]
@@ -102,7 +107,7 @@ print_string:
     jmp print_string
 end:
     ret
-
+[global enableA20]
 check_a20:
     pushf
     push ds
@@ -276,6 +281,6 @@ start_protected_mode:
     ; print an "A" to indicate that we have reached Protected Mode
     mov ah, 0x0f ; bg=black fg=white
     mov al, 'A'
-    mov [0xb80000], ax
+    mov [0xb8000], ax
     jmp KERNEL_LOCATION
     jmp $

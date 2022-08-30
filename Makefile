@@ -31,7 +31,10 @@ bootloader: setup
 	nasm -f bin bootloader/boot.asm -o bins/boot.bin
 	nasm -f elf bootloader/stage2/loader.asm -o objs/loader.o
 	/usr/local/i386elfgcc/bin/i386-elf-g++ -ffreestanding -m16 -g -c bootloader/stage2/stage2.cpp -o objs/stage2.o -mno-red-zone -O1 -fpermissive
-	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/stage2.bin -Ttext 0x00001000 objs/loader.o objs/stage2.o --oformat binary
+	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/stage2_content.bin -Ttext 0x00001000 objs/loader.o objs/stage2.o --oformat binary
+	nasm -f bin bootloader/stage2/stage2_base.asm -o bins/stage2_base.bin
+	dd if=bins/stage2_base.bin of=bins/stage2.bin
+	dd if=bins/stage2_content.bin of=bins/stage2.bin conv=notrunc
 	nasm bootloader/zeroes.asm -f bin -o bins/zeroes.bin
 
 image: bootloader kernel setup
