@@ -1,24 +1,22 @@
 [org 0x7c00]
+[bits 16]
 ; Bootloader
 main:
-    KERNEL_LOCATION equ 0x00007EF0
+    STAGE2_LOCATION equ 0x00001000
     mov [0x5004], dl
     xor ax, ax                          
     mov es, ax
     mov ds, ax
-    mov sp, 0x7c00 ; Does the stack work with out a base address? YES IT DOES!
+    mov bp, 0x7c00 ; Does the stack work with out a base address? YES IT DOES!
+    mov sp, bp
     
     ;clear the screen
 	mov ah, 0x00
 	mov al, 0x3
 	int 0x10
 
-    call memory_detection
-    call upper_memory_detection
-    
-
-    mov bx, KERNEL_LOCATION
-    mov dh, 66
+    mov bx, STAGE2_LOCATION
+    mov dh, 2
 
     mov ah, 0x02
     mov al, dh 
@@ -27,175 +25,24 @@ main:
     mov cl, 0x02
     mov dl, [0x5004]
     int 0x13
-    jnc after_load
+    jnc after_load_stage2
+error:
     mov ah, 0x0e
-    mov bx, failed_disk
+    mov bx, failed_disk_stage2
     call print_string
     jmp $
-memory_detection:
-    clc
-    int 0x12
-    jc failed_memory
-after_memory_detection:
-    mov [0x5000], ax
-    ret
-upper_memory_detection:
-    ;detect upper memory.
-    mov ax, 0xE801
-    int 0x15
-    jc failed_memory
-after_upper_memory_detection:
-    xor dx, dx
-    mov cx, 1024
-    div cx
-    mov cx, ax
-    xor dx, dx
-    mov ax, bx
-    mov bx, 64
-    mul bx
-    mov bx, 1024
-    div bx
-    add cx, ax
-    mov ax, cx
-    mov [0x5002], ax
-    ret
-failed_memory:
-    mov ah, 0x0e
-    mov bx, failed_mem
-    call print_string
-    jmp $
-after_load:
+
+after_load_stage2:
     mov ah, 0x0e
     mov bx, good
-    call print_string
-    
-    mov ah, 0x0
-    mov al, 0x14
-    int 0x10
 
-    call enableA20
-    
-    cli
-    lgdt [GDT_descriptor]
-    mov eax, cr0
-    or eax, 1
-    mov cr0, eax
-    jmp CODE_SEG:start_protected_mode
-    jmp $
+    call print_string
 
-check_a20:
-    pushf
-    push ds
-    push es
-    push di
-    push si
- 
-    cli
- 
-    xor ax, ax ; ax = 0
-    mov es, ax
- 
-    not ax ; ax = 0xFFFF
-    mov ds, ax
- 
-    mov di, 0x0500
-    mov si, 0x0510
- 
-    mov al, byte [es:di]
-    push ax
- 
-    mov al, byte [ds:si]
-    push ax
- 
-    mov byte [es:di], 0x00
-    mov byte [ds:si], 0xFF
- 
-    cmp byte [es:di], 0xFF
- 
-    pop ax
-    mov byte [ds:si], al
- 
-    pop ax
-    mov byte [es:di], al
- 
-    mov ax, 0
-    je check_a20__exit
- 
-    mov ax, 1
- 
-check_a20__exit:
-    pop si
-    pop di
-    pop es
-    pop ds
-    popf
- 
-    ret
+    mov ah, 0x0e
+    mov bx, jumping
+    call print_string
 
-enableA20:
-    call A20check
-a20_bios_func:
-    mov     ax,2403h                ;--- A20-Gate Support ---
-    int     15h
-    jb      A20ns                  ;INT 15h is not supported
-    cmp     ah,0
-    jnz     A20ns                  ;INT 15h is not supported
-    
-    mov     ax,2402h                ;--- A20-Gate Status ---
-    int     15h
-    jb      A20failed              ;couldn't get status
-    cmp     ah,0
-    jnz     A20failed              ;couldn't get status
-    
-    cmp     al,1
-    jz      A20done                 ;A20 is already activated
-    
-    mov     ax,2401h                ;--- A20-Gate Activate ---
-    int     15h
-    jb      A20failed              ;couldn't activate the gate
-    cmp     ah,0
-    jnz     A20failed              ;couldn't activate the gate
- 
-a20_activated:                  ;go on
-    call A20check
-fastA20:
-    in al, 0x92
-    test al, 2
-    jnz after
-    or al, 2
-    and al, 0xFE
-    out 0x92, al
-after:
-    mov bx, 0xffff
-chk_loop:
-    call A20check
-    sub bx, 1
-    jnz chk_loop
-    jmp A20failed
-A20check:
-    call check_a20
-    test ax,ax
-    jz .end  
-.succes:
-    call A20done
-    pop ax
-.end:
-    ret
-A20done:
-    mov ah, 0x0e
-    mov bx, a20_enabled
-    call print_string
-    ret
-A20failed:
-    mov ah, 0x0e
-    mov bx, a20_activation_failed
-    call print_string
-    jmp $
-A20ns:
-    mov ah, 0x0e
-    mov bx, a20_not_supported
-    call print_string
-    jmp $
+    jmp STAGE2_LOCATION
 
 print_string:
     mov al, [bx]
@@ -210,60 +57,8 @@ jmp $
 
 label: db "Hello, world!", 0
 good: db "Success!", 0xD, 0xA, 0
-failed_disk: db "Failed to load Kernel!", 0
-failed_mem: db "Failed to detect memory!", 0
-a20_not_supported:
-a20_activation_failed: db "A20 failed!", 0
-a20_enabled: db "A20 enabled!", 0
+failed_disk_stage2: db "Failed to load Stage 2!", 0
+jumping: db "Jumping to second stage!", 0xD, 0xA, 0
 
-CODE_SEG equ GDT_code - GDT_start
-DATA_SEG equ GDT_data - GDT_start
-
-GDT_start:                          ; must be at the end of real mode code
-    GDT_null:
-        dd 0x0
-        dd 0x0
-
-    GDT_code:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10011010
-        db 0b11001111
-        db 0x0
-
-    GDT_data:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10010010
-        db 0b11001111
-        db 0x0
-GDT_end:
-
-GDT_descriptor:
-    dw GDT_end - GDT_start - 1
-    dd GDT_start
-
-[bits 32]
-start_protected_mode:
-    ; reset the segments
-    mov ax, DATA_SEG
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
-    
-    ; set up the stack
-	mov ebp, 0xf0000 ; maximum stack size
-	mov esp, ebp
-
-    ; print an "A" to indicate that we have reached Protected Mode
-    mov ah, 0x0f ; bg=black fg=white
-    mov al, 'A'
-    mov [0xb80000], ax
-    jmp KERNEL_LOCATION
-    jmp $
 times 510-($-$$) db 0
 dw 0xaa55
