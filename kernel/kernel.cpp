@@ -350,6 +350,10 @@ extern "C" void main(){
 
     kernel_main(); // Run the kernel
 
+    while (true) {
+        asm("hlt"); // Only do stuff when an interrupt occurs.
+    }
+
     return;
 }
 #include "klib.cpp"

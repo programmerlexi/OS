@@ -168,10 +168,10 @@ void terminal_loop() {
                     print_string("Type 'help' for a list of commands.\n\r");
                     printed = false;
                 }
-                free(input);
             } else {
                 printed = false;
             }
+            free(input);
             enter_pressed_before = true;
         } else if (!kpressed[0x1c]) {
             enter_pressed_before = false;
