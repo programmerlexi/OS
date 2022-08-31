@@ -132,15 +132,16 @@ void kpanic(const char* message,regs_t* r) {
 	panic_print(" If you encounter this error",1200+80*6);
 	panic_print(" and you did not modify the code,",1280+80*6);
 	panic_print(" please report it to the author.",1360+80*6);
-	panic_print("   The System will now freeze ",522);
-	panic_print("      and you will have to    ",602);
-	panic_print("       reboot it manually.    ",682);
+	panic_print("  The System will reboot  ",522);
+	panic_print("     in a few moments.    ",602);
+	//panic_print("       reboot it manually.    ",682);
 	panic_print("Debug Scope: ", 1120+80*2+45);
 	panic_print(get_debug_location(),1120+80*2+45+13);
 	panic_cursor_off();
-    /*for (int i = 0; i < 0xeeeeef*10;i++) {
+    for (uint32_t i = 0; i < 0x4fffffff;i++) {
         asm("nop");
-    }*/ // kpanic is useful for debugging too
+    } // kpanic is useful for debugging too
+    power_restart();
     asm("hlt");
 	for (;;);
 }
