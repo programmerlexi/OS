@@ -99,6 +99,6 @@ extern "C" void _fault_handler(regs_t *r)
 {
     if (r->int_no < 32)
     {
-		kpanic(exception_messages[r->int_no],r);
+		if (handle_interrupts) kpanic(exception_messages[r->int_no],r);
  	}
 }

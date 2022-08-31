@@ -40,6 +40,9 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 
 #include "sound/pcspeaker.h"
 #include "services/rtc.h"
+#include "fs/fs.h"
+#include "fs/devfs/devfs.h"
+#include "fs/rootfs/rootfs.h"
 
 void kernel_test();
 
@@ -295,6 +298,8 @@ void kernel_init() {
     print_string("Initializing processes!\r");
     proc_init(); // Initialize processses
     print_string("[OK] Processes initialized!\n\r");
+    print_string("Creating Filesystem\n\r");
+    init_fs();
     asm volatile("cli"); // Disable interrupts
     print_string("Initializing interrupts!\r");
     idt_install(); // Create the IDT

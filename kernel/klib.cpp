@@ -31,3 +31,6 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 
 #include "sound/pcspeaker.cpp"
 #include "services/rtc.cpp"
+#include "fs/devfs/devfs.cpp"
+#include "fs/rootfs/rootfs.cpp"
+#include "fs/fs.cpp"

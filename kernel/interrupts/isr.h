@@ -35,3 +35,5 @@ extern "C" void _isr29();
 extern "C" void _isr30();
 extern "C" void _isr31();
 void isrs_install();
+
+bool handle_interrupts = true;
