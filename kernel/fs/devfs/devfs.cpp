@@ -90,7 +90,7 @@ void create_dev_file(char* name, uint16_t device, dev_type type) {
 }
 
 void init_devfs() {
-    mount((char*)"/dev",read_dev_bytes,write_dev_bytes,open_dev_file,create_dev_file);
+    mount((char*)"/dev",(void*)read_dev_bytes,(void*)write_dev_bytes,(void*)open_dev_file,(void*)create_dev_file);
     for (int i = 0; i < 255; i++) {
         dev_files[i] = NULL;
     }

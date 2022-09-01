@@ -29,9 +29,9 @@ void shutdown() {
 }
 
 void clear() {
-    enter_debug_scope("Clearing");
+    enter_debug_scope((char*)"Clearing");
     clear_screen();
-    enter_debug_scope("Exiting");
+    enter_debug_scope((char*)"Exiting");
     proc_quit(0);
     exit_debug_scope();
 }
