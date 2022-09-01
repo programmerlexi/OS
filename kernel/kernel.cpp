@@ -293,7 +293,15 @@ void kernel_init() {
     //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     init_vga(); // Initialize VGA
     vga_graphics::init_graphics();
-    vga_graphics::draw_rect(130,80,40,40,BLUE);
+    if (get_boot_info()->splash_screen) {
+        vga_graphics::draw_rect(124,74,52,52,LIGHT_BLUE);
+        for (int i = 0; i < 2; i++) {
+            vga_graphics::draw_rect(124+((i+1)*16)+(i*2),74,2,52,BLACK);
+            vga_graphics::draw_rect(124,74+((i+1)*16)+(i*2),52,2,BLACK);
+        }
+    } else {
+        switch_to_text_mode();
+    }
     if (check_pge()) {
         print_string("[OK] Paging Enabled\n\r");
     }
@@ -332,7 +340,9 @@ void kernel_init() {
     identify_ata(0xA0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
-    switch_to_text_mode();
+    if (get_boot_info()->splash_screen) {
+        switch_to_text_mode();
+    }
     exit_debug_scope();
 }
 
