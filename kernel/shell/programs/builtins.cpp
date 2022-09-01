@@ -42,13 +42,12 @@ void crash() {
 
 void read_sector_one() {
     print_string("Reading first sector\n\r");
-    uint8_t* buf = (uint8_t*)LBA28_read_sectors(get_boot_info()->disk,0,1);
-    for (uint32_t i = 0; i < 512; i++) {
-        putchar(buf[i],color(DARK_GRAY,0xf),index(vga_pos));
-        vga_pos++;
-        swap_buffers();
+    uint16_t* buf = (uint16_t*)LBA28_read_sectors(0xA0,0,1);
+    for (uint32_t i = 0; i < 256; i++) {
+        print_string(HexToString(buf[i]));
+        print_string(" ");
     }
-    print_string("\n\r");
+    free(buf);
     proc_quit(0);
 }
 

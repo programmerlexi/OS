@@ -1,4 +1,5 @@
 #include "disk.h"
+#include "../memory/heap.h"
 void identify_ata(uint8_t drive) {
     // 0xA0 for Master
 	// 0xB0 for Slave
@@ -55,7 +56,7 @@ uint16_t* LBA28_read_sectors(uint8_t drive, uint32_t LBA, uint8_t sector) {
     outb(0x1F4, (uint8_t)(LBA >> 8));
 	outb(0x1F5, (uint8_t)(LBA >> 16)); 
 	outb(0x1F7, 0x20); // 0x20 = 'Read' Command
-    uint16_t *addr;
+    uint16_t *addr = (uint16_t)calloc(sizeof(uint16_t)*256*sector);
     for(int j = 0; j < sector; j++) {
         wait_BSY();
         wait_DRQ();

@@ -14,10 +14,7 @@ extern "C" void jump_to_protected_mode();
 extern "C" void enableA20();
 
 extern "C" void loader_c() {
-    print_string("Loading OS in a few moments...\n\r");
-    for (unsigned int i = 0; i < 0x4fffffff; i++) {
-        asm volatile("nop");
-    }
+    print_string("Reached loader_c!\n\r");
     print_string("Enabling A20 line...\n\r");
     enableA20();
     print_string("Loading Kernel from disk ...\n\r");
