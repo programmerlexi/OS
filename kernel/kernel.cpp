@@ -292,6 +292,8 @@ void kernel_init() {
     memory_self_test(); // Run memory self-test.
     //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     init_vga(); // Initialize VGA
+    vga_graphics::init_graphics();
+    vga_graphics::draw_rect(130,80,40,40,BLUE);
     if (check_pge()) {
         print_string("[OK] Paging Enabled\n\r");
     }
@@ -330,6 +332,7 @@ void kernel_init() {
     identify_ata(0xA0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
+    switch_to_text_mode();
     exit_debug_scope();
 }
 

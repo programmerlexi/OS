@@ -79,3 +79,10 @@ void reset_vga_pos();
 void print_int(int value);
 void color_rect(unsigned int x, unsigned int y, unsigned int width, unsigned int height, char color);
 void switch_to_text_mode();
+static unsigned get_fb_seg();
+namespace vga_graphics {
+    void init_graphics();
+    void switch_to_graphics_mode();
+    void putpixel(uint16_t x, uint16_t y, uint8_t color);
+    void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint8_t color);
+}

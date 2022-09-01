@@ -1,5 +1,6 @@
 #include "bki.cpp"
 #include "gatr/vga_text.cpp"
+#include "gatr/vga_graphics.cpp"
 #include "utils/util.cpp"
 #include "utils/math.cpp"
 #include "utils/random.cpp"
