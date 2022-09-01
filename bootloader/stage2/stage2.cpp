@@ -27,19 +27,25 @@ extern "C" void set_protected_mode();
 extern "C" void jump_to_protected_mode();
 extern "C" void enableA20();
 
+uint8_t prev_key = 0;
+
 extern "C" void loader_c() {
     print_string("Reached loader_c!\n\r");
     print_string("You can type anything here\n\r");
     print_string("Press ENTER to boot or ESC to reboot...\n\r");
     uint8_t key = 0;
     while ((key = get_input_keycode()) != 0x1C) {
-        if (key == 0x01) {
-            outb(0x60,0xFE);
+        if (!(prev_key == key)) {
+            if (key == 0x01) {
+
+                outb(0x64,0xFE); // Tell the keyboard controller to pulse the reset line
+            }
+            char c = get_ascii_char(key);
+            if (c != 0) {
+                print_char(c);
+            }
         }
-        char c = get_ascii_char(key);
-        if (c != 0) {
-            print_char(c);
-        }
+        prev_key = key;
     }
     print_string("Enabling A20 line...\n\r");
     enableA20();
