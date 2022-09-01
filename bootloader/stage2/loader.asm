@@ -32,7 +32,7 @@ load_kernel_from_disk:
     mov al, dh 
     mov ch, 0x00
     mov dh, 0x00
-    mov cl, 0x06
+    mov cl, 0x08
     mov dl, [0x5004]
     int 0x13
     jnc after_load
@@ -264,7 +264,6 @@ A20ns:
     mov bx, a20_not_supported
     call print_string
     jmp $
-
 
 stage2_string: db "Reached Stage 2!", 0xD, 0xA, 0
 memory: db "Running memory detection!", 0xD, 0xA, 0

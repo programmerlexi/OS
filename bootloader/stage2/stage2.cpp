@@ -1,4 +1,7 @@
+typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long uint64_t;
 
 void print_string(const char*);
 void print_string(char*);
@@ -6,6 +9,17 @@ void print_char(char);
 void print_int(uint16_t);
 char* num_to_char(uint16_t);
 int digit_count(uint16_t);
+
+uint8_t inb(uint16_t port);
+uint16_t inw(uint16_t port);
+uint32_t inl(uint16_t port);
+
+void outb(uint16_t port, uint8_t val);
+void outw(uint16_t port, uint16_t val);
+void outl(uint16_t port, uint32_t val);
+
+uint8_t get_input_keycode();
+char get_ascii_char(uint8_t key);
 
 extern "C" void load_kernel_from_disk();
 extern "C" void load_gdt();
@@ -15,6 +29,18 @@ extern "C" void enableA20();
 
 extern "C" void loader_c() {
     print_string("Reached loader_c!\n\r");
+    print_string("You can type anything here\n\r");
+    print_string("Press ENTER to boot or ESC to reboot...\n\r");
+    uint8_t key = 0;
+    while ((key = get_input_keycode()) != 0x1C) {
+        if (key == 0x01) {
+            outb(0x60,0xFE);
+        }
+        char c = get_ascii_char(key);
+        if (c != 0) {
+            print_char(c);
+        }
+    }
     print_string("Enabling A20 line...\n\r");
     enableA20();
     print_string("Loading Kernel from disk ...\n\r");
@@ -83,3 +109,45 @@ char* num_to_char(uint16_t byte) {
     }
     return number;
 }
+
+uint8_t get_input_keycode()
+{
+    uint8_t keycode = 0;
+    while((keycode = inb(0x60)) != 0){
+        if(keycode > 0)
+            return keycode;
+    }
+    return keycode;
+}
+
+uint8_t inb(uint16_t port) {
+    uint8_t data;
+    asm volatile("inb %1, %0" : "=a"(data) : "Nd"(port));
+    return data;
+}
+
+uint16_t inw(uint16_t port) {
+    uint16_t data;
+    asm volatile("inw %1, %0" : "=a"(data) : "Nd"(port));
+    return data;
+}
+
+uint32_t inl(uint16_t port) {
+    uint32_t data;
+    asm volatile("inl %1, %0" : "=a"(data) : "Nd"(port));
+    return data;
+}
+
+void outb(uint16_t port, uint8_t data) {
+    asm volatile("outb %0, %1" : : "a"(data), "Nd"(port));
+}
+
+void outw(uint16_t port, uint16_t data) {
+    asm volatile("outw %0, %1" : : "a"(data), "Nd"(port));
+}
+
+void outl(uint16_t port, uint32_t data) {
+    asm volatile("outl %0, %1" : : "a"(data), "Nd"(port));
+}
+
+#include "keycode.cpp"
