@@ -26,6 +26,7 @@ extern "C" void load_gdt();
 extern "C" void set_protected_mode();
 extern "C" void jump_to_protected_mode();
 extern "C" void enableA20();
+extern "C" void EnableSSE();
 
 uint8_t prev_key = 0;
 

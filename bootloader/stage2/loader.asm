@@ -265,6 +265,26 @@ A20ns:
     call print_string
     jmp $
 
+[global EnableSSE]
+EnableSSE:
+    mov eax, 0x1
+    cpuid
+    test edx, 1<<25
+    jz .noSSE
+    mov eax, cr0
+    and ax, 0xFFFB		;clear coprocessor emulation CR0.EM
+    or ax, 0x2			;set coprocessor monitoring  CR0.MP
+    mov cr0, eax
+    mov eax, cr4
+    or ax, 3 << 9		;set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
+    mov cr4, eax
+    ret
+.noSSE:
+    mov ah, 0x0e
+    mov bx, sse_unavailable
+    call print_string
+    jmp $
+
 stage2_string: db "Reached Stage 2!", 0xD, 0xA, 0
 memory: db "Running memory detection!", 0xD, 0xA, 0
 finished_memory: db "Finished memory detection!", 0xD, 0xA, 0
@@ -274,6 +294,7 @@ a20_not_supported:
 a20_activation_failed: db "A20 failed!", 0
 a20_enabled: db "A20 enabled!", 0xD, 0xA, 0
 good: db "Success!", 0xD, 0xA, 0
+sse_unavailable: db "SSE is unavailable!", 0
 
 
 GDT_start:                          ; must be at the end of real mode code
