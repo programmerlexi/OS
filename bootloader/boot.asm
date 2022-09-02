@@ -13,7 +13,7 @@ main:
     
     ;clear the screen
 	mov ah, 0x00
-	mov al, 0x3
+	mov al, 0x2
 	int 0x10
 
     mov bx, STAGE2_LOCATION
@@ -26,7 +26,7 @@ main:
     mov cl, 0x02
     mov dl, [0x5004]
     int 0x13
-    
+
     jnc after_load_stage2
 error:
     mov ah, 0x0e

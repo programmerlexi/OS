@@ -24,10 +24,17 @@ static void play_sound(uint32_t nFrequence) {
  	outb(0x61, tmp);
  }
  
- //Make a beep
- void beep() {
- 	 play_sound(1000);
- 	 sleep(10);
- 	 nosound();
-          //set_PIT_2(old_frequency);
- }
+void beep(uint32_t hz, int length) {
+	play_sound(hz);
+ 	sleep(length);
+ 	nosound();
+}
+
+void beep(uint32_t hz) {
+	beep(hz,10);
+}
+
+//Make a beep
+void beep() {
+	beep(750);
+}

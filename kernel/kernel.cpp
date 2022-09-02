@@ -342,6 +342,7 @@ void kernel_init() {
     slave_rdy = identify_ata(0xB0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
+    beep();
     if (get_boot_info()->splash_screen) {
         switch_to_text_mode();
     }

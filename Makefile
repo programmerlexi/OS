@@ -47,11 +47,11 @@ iso: image
 
 run: image setup
 	echo "Launching"
-	qemu-system-i386 images/OS.bin -m 4G
+	qemu-system-i386 images/OS.bin -m 4G -soundhw pcspk
 
 kvm: image setup
 	echo "Launching KVM"
-	kvm-spice images/OS.bin
+	kvm-spice images/OS.bin -soundhw pcspk
 #096M
 
 

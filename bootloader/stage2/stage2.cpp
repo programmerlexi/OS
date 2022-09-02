@@ -51,7 +51,8 @@ extern "C" void loader_c() {
         }
         prev_key = key;
     }
-    
+    print_string("Enabling SSE...\n\r");
+    EnableSSE();
     print_string("Enabling A20 line...\n\r");
     enableA20();
     print_string("Loading Kernel from disk ...\n\r");

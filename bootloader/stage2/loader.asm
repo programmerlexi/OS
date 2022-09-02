@@ -338,7 +338,7 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0xf0000 ; maximum stack size
+	mov ebp, 0x7ef0 ; maximum stack size
 	mov esp, ebp
     
     ; print an "A" to indicate that we have reached Protected Mode
