@@ -8,6 +8,9 @@
 #define STATUS_DF       0x20
 #define STATUS_ERR      0x01
 
+bool master_rdy = false;
+bool slave_rdy = false;
+
 bool identify_ata(uint8_t drive);
 void wait_BSY();
 void wait_DRQ();

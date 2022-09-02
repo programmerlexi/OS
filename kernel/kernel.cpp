@@ -337,7 +337,9 @@ void kernel_init() {
     print_string("Performing Timer Self Test!\n\r");
     timer_self_test();
     print_string("Identifying Master ATA.\n\r");
-    identify_ata(0xA0);
+    master_rdy = identify_ata(0xA0);
+    print_string("Identifying Slave ATA.\n\r");
+    slave_rdy = identify_ata(0xB0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
     if (get_boot_info()->splash_screen) {
@@ -375,10 +377,14 @@ void kernel_main() {
     uint8_t disk = *((uint8_t*)0x5004);
     print_string(HexToString(disk));
     if (disk & 0x80) {
-        print_string(" (HDD)");
+        print_string(" (HDD)\n\r");
     } else {
-        print_string(" (Floppy or Unknown)");
+        print_string(" (Floppy or Unknown)\n\r");
     }
+    print_string("Master Drive Ready: ");
+    print_string(master_rdy ? "Yes\n\r" : "No\n\r");
+    print_string("Slave Drive Ready: ");
+    print_string(slave_rdy ? "Yes\n\r" : "No\n\r");
     terminal_init(); // Initialize the terminal
     proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     exit_debug_scope();
