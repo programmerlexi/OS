@@ -8,7 +8,7 @@
 #define STATUS_DF       0x20
 #define STATUS_ERR      0x01
 
-void identify_ata(uint8_t drive);
+bool identify_ata(uint8_t drive);
 void wait_BSY();
 void wait_DRQ();
 uint16_t* LBA28_read_sectors(uint8_t drive, uint32_t LBA, uint8_t sector);

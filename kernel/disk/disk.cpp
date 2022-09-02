@@ -1,6 +1,6 @@
 #include "disk.h"
 #include "../memory/heap.h"
-void identify_ata(uint8_t drive) {
+bool identify_ata(uint8_t drive) {
     // 0xA0 for Master
 	// 0xB0 for Slave
 
@@ -37,6 +37,7 @@ void identify_ata(uint8_t drive) {
                 break;
         }
     }
+    return tmp & STATUS_RDY;
 }
 
 void wait_BSY(){
