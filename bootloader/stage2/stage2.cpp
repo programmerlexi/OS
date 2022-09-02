@@ -32,9 +32,10 @@ uint8_t prev_key = 0;
 extern "C" void loader_c() {
     print_string("Reached loader_c!\n\r");
     print_string("You can type anything here\n\r");
-    print_string("Press ENTER to boot, '.' to toggle splash or ESC to reboot...\n\r");
+    print_string("Press ENTER to boot, '.' to toggle splash (default: on) or ESC to reboot...\n\r");
     uint8_t key = 0;
     bool* splash = (bool*)0x5005;
+    *splash = true;
     while ((key = get_input_keycode()) != 0x1C) {
         if (!(prev_key == key)) {
             if (key == 0x01) {
