@@ -358,9 +358,8 @@ start_protected_mode:
 	mov ebp, 0xf0000 ; maximum stack size
 	mov esp, ebp
     
-    ; print an "A" to indicate that we have reached Protected Mode
-    mov ah, 0x0f ; bg=black fg=white
-    mov al, 'A'
+    ; print a smiley to indicate that we have reached Protected Mode
+    mov ax, 0x0f01
     mov [0xb8000], ax
     jmp KERNEL_LOCATION
     jmp $
