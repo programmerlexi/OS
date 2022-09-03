@@ -240,21 +240,21 @@ void set_mode(uint64_t idx) {
             driver.width = 320;
             driver.height = 200;
             driver.registers = g_320x200x4;
-            driver.putpixel = g_320x200x4_putpixel;
+            driver.putpixel = (void*)g_320x200x4_putpixel;
             driver.direct = true; // Allow direct writing to the graphics buffer
             break;
         case 1:
             driver.width = 640;
             driver.height = 480;
             driver.registers = g_640x480x16;
-            driver.putpixel = g_640x480x16_putpixel;
+            driver.putpixel = (void*)g_640x480x16_putpixel;
             driver.direct = false; // We use multiple planes so we need to disallow direct writing
             break;
         case 2:
             driver.width = 720;
             driver.height = 480;
             driver.registers = g_720x480x16;
-            driver.putpixel = g_640x480x16_putpixel;
+            driver.putpixel = (void*)g_640x480x16_putpixel;
             driver.direct = false;
             break;
     }
