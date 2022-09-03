@@ -71,6 +71,7 @@ void terminal_init() {
         print_string("You are logged in as ");
         print_string(USER);
         print_string(".\n\r");
+        set_input(true);
         logged = true;
     }
     printed = false;
@@ -122,6 +123,7 @@ void terminal_loop() {
         }
     }
     if (printed) {
+        set_input(true);
         if (kpressed[0x1c] && !enter_pressed_before) {
             char* input = get_input();
             clear_input();

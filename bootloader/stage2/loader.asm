@@ -1,10 +1,10 @@
 bits 16
-KERNEL_LOCATION equ 0x00007ef0
+KERNEL_LOCATION equ 0x00006000
 stage2:
     xor ax, ax                          
     mov es, ax
     mov ds, ax
-    mov bp, 0x7c00 ; Does the stack work with out a base address? YES IT DOES!
+    mov bp, 0x1000 ; Does the stack work with out a base address? YES IT DOES!
     mov sp, bp
 
     mov ah, 0x0e
@@ -338,7 +338,7 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0x7ef0 ; maximum stack size
+	mov ebp, 0xf0000 ; maximum stack size
 	mov esp, ebp
     
     ; print an "A" to indicate that we have reached Protected Mode

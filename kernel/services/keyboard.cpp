@@ -20,7 +20,7 @@ void keyboard_handler(struct regs *r)
     }
     else
     {
-        if (input_enabled) {
+        if (1) {
     	    switch(scancode){
         		case 0x4b: set_cursor_pos(vga_pos-1); break;
         		case 0x4d: set_cursor_pos(vga_pos + 1); break;
@@ -52,8 +52,8 @@ void kb_install()
 {
     print_string("Installing keyboard...          \r");
     irq_install_handler(1, keyboard_handler);
-	print_string("Disabling keyboard...                 \r");
-    input_enabled = false;
+	/*print_string("Disabling keyboard...                 \r");
+    input_enabled = false;*/
 }
 
 void clear_input(){

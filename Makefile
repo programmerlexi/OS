@@ -24,7 +24,7 @@ kernel: setup
 	echo "Building Kernel"
 	nasm -f elf kernel/kernel_entry.asm -o objs/kernel_entry.o
 	/usr/local/i386elfgcc/bin/i386-elf-g++ -ffreestanding -m32 -g -c kernel/kernel.cpp -o objs/kernel.o -mno-red-zone -O1 -fpermissive
-	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0x00007ef0 objs/kernel_entry.o objs/kernel.o --oformat binary
+	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0x00006000 objs/kernel_entry.o objs/kernel.o --oformat binary
 
 bootloader: setup
 	echo "Building Bootloader"

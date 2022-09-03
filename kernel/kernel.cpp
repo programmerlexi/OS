@@ -124,6 +124,7 @@ int smiley_width = 8;
 int smiley_heigth = 4;
 void kpanic(const char* message,regs_t* r) {
     asm("cli");
+    switch_to_text_mode();
 	panic_clear();
 	panic_print("Error: ", 20);
 	panic_print(message, 27);
@@ -262,7 +263,7 @@ void memory_self_test() {
 
 void timer_self_test() {
     timer_ticks = 0;
-    int i = 0xfffffff;
+    int i = 0xffffff;
     while (timer_ticks == 0) {
         asm("nop");
         i--;
@@ -299,7 +300,7 @@ void kernel_init() {
             vga_graphics::draw_rect(124+((i+1)*16)+(i*2),74,2,52,BLACK);
             vga_graphics::draw_rect(124,74+((i+1)*16)+(i*2),52,2,BLACK);
         }*/
-        vga_graphics::draw_rect(274,194,92,92,LIGHT_BLUE);
+        vga_graphics::draw_rect(274,194,92,92,0b1001);
         for (int i = 0; i < 2; i++) {
             vga_graphics::draw_rect(274+((i+1)*28)+(i*4),194,4,92,BLACK);
             vga_graphics::draw_rect(274,194+((i+1)*28)+(i*4),92,4,BLACK);
@@ -325,6 +326,7 @@ void kernel_init() {
     print_string("[OK] ISRs installed!     \n\r");
     print_string("Installing syscalls!\r");
     irq_install(); // Install the IRQs into the IDT
+    asm volatile("sti"); // Enable interrupt
     sys_init(); // Initialize the syscall handler
     print_string("[OK] Syscalls initialized!      \n\r");
     print_string("Installing timer!\r");
@@ -338,7 +340,6 @@ void kernel_init() {
     enable_mouse(); // Enable the mouse
     proc_create((void*)process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
     print_string("[OK] Mouse installed!\n\r");
-    asm volatile("sti"); // Enable interrupt
     print_string("Performing Timer Self Test!\n\r");
     timer_self_test();
     print_string("Identifying Master ATA.\n\r");

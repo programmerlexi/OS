@@ -460,7 +460,7 @@ void load_text_registers() {
 }
 
 void init_vga() {
-    vgaBackBuffer = (char*)malloc(4800*sizeof(char));
+    //vgaBackBuffer = (char*)malloc(4800*sizeof(char));
 	switch_to_text_mode();
     /*vgaBuffer = (char*)0xb8000;
     clear_screen();*/
@@ -475,18 +475,18 @@ void set_cursor_pos(uint64_t pos) {
 }
 
 void putchar(char c, char colorCode, unsigned int pos) {
-    *(char*)(vgaBackBuffer + pos) = c;
-    *(char*)(vgaBackBuffer + pos + 1) = colorCode;
+    *(char*)(vgaBuffer + pos) = c;
+    *(char*)(vgaBuffer + pos + 1) = colorCode;
     /**(char*)(0xb8000 + pos) = c;
     *(char*)(0xb8000 + pos + 1) = colorCode;*/
 }
 
 uint8_t getchar(unsigned int pos) {
-    return *(char*)(vgaBackBuffer + pos);
+    return *(char*)(vgaBuffer + pos);
 }
 
 void swap_buffers() {
-    memcpy(vgaBuffer, (uint8_t*)vgaBackBuffer, VGA_WIDTH*VGA_HEIGHT*2);
+    //memcpy(vgaBuffer, (uint8_t*)vgaBackBuffer, VGA_WIDTH*VGA_HEIGHT*2);
 }
 
 void disable_cursor() {
@@ -504,13 +504,13 @@ unsigned int index(unsigned int char_index) {
 }
 
 void scroll_down() {
-    memcpy((uint8_t*)vgaBackBuffer, (uint8_t*)(vgaBackBuffer + VGA_WIDTH*2), (VGA_HEIGHT-1)*(VGA_WIDTH*2));
-    memset((uint8_t*)(vgaBackBuffer+((VGA_HEIGHT-1)*(VGA_WIDTH*2))), 0, VGA_WIDTH*2);
+    memcpy((uint8_t*)vgaBuffer, (uint8_t*)(vgaBuffer + VGA_WIDTH*2), (VGA_HEIGHT-1)*(VGA_WIDTH*2));
+    memset((uint8_t*)(vgaBuffer+((VGA_HEIGHT-1)*(VGA_WIDTH*2))), 0, VGA_WIDTH*2);
     vga_pos -= (int)vga_pos % 80;
 }
 
 void clear_screen() {
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 80*25; i++) {
         putchar(' ', color(0x0, 0xF), index(i));
     }
     set_cursor_pos(0);
@@ -653,7 +653,7 @@ void color_rect(int x, int y, int width, int height, char colorCode) {
     }
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            *(char*)(vgaBackBuffer + index(x + j + (y + i) * 80) + 1) = colorCode; 
+            *(char*)(vgaBuffer + index(x + j + (y + i) * 80) + 1) = colorCode; 
         }
     }
 }

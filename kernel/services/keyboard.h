@@ -5,6 +5,7 @@
 #include "../gatr/vga.h"
 
 #define DATA_PORT 0x60 
+#define COMMAND_PORT 0x64
 
 char kpressed[128] = {0,};
 bool input_enabled = false;
