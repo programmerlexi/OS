@@ -190,9 +190,9 @@ void mouse_install() {
     print_string("Installing mouse handler...               \r");
     irq_install_handler(0xC, mouse_handler);
     print_string("Initializing mouse position...         \r");
-    mouse_pos.x = (int)VGA_WIDTH/2;
-    mouse_pos.y = (int)VGA_HEIGHT/2;
-    mouse_pos_old.x = (int)VGA_WIDTH/2;
-    mouse_pos_old.y = (int)VGA_HEIGHT/2;
+    mouse_pos.x = 0;
+    mouse_pos.y = 0;
+    mouse_pos_old.x = 0;
+    mouse_pos_old.y = 0;
     //putchar('A', color(0x0,0xF), index(mouse_pos.x + (mouse_pos.y*VGA_WIDTH)));
 }

@@ -180,7 +180,6 @@ void clear_screen() {
             }
         }
     } else {
-        unsigned pmask = 1;
         for (int i = 0; i < 4; i++) {
             set_plane(i);
             for (uint32_t y = 0; y < driver.height; y++) {
@@ -192,7 +191,6 @@ void clear_screen() {
 					}
                 }
             }
-            pmask <<= 1;
         }
     }
 }
@@ -244,6 +242,9 @@ void set_mode(uint64_t idx) {
             driver.registers = g_320x200x4;
             driver.putpixel = (void*)g_320x200x4_putpixel;
             driver.direct = true; // Allow direct writing to the graphics buffer
+			c_width = 40;
+			c_height = 12;
+			c_reroute = true;
             break;
         case 1:
             driver.width = 640;
@@ -251,6 +252,9 @@ void set_mode(uint64_t idx) {
             driver.registers = g_640x480x16;
             driver.putpixel = (void*)g_640x480x16_putpixel;
             driver.direct = false; // We use multiple planes so we need to disallow direct writing
+			c_width = 80;
+			c_height = 30;
+			c_reroute = true;
             break;
         case 2:
             driver.width = 720;
@@ -258,11 +262,30 @@ void set_mode(uint64_t idx) {
             driver.registers = g_720x480x16;
             driver.putpixel = (void*)g_640x480x16_putpixel;
             driver.direct = false;
+			c_width = 90;
+			c_height = 30;
+			c_reroute = true;
             break;
     }
     load_graphics_registers();
     graphics_buffer = (uint8_t*)(get_fb_seg()*16);
     clear_screen();
+}
+
+void scroll_down(int value) {
+	for (int p = 0; p < 4; p++) {
+		set_plane(p);
+		memcpy(graphics_buffer,graphics_buffer+(value*driver.width),(driver.width*driver.height)-(value*driver.width));
+		for (uint32_t y = driver.height-value; y < driver.height; y++) {
+            uint32_t truey = (y*(driver.width/8));
+            for (uint32_t x = 0; x < driver.width; x++) {
+				if (graphics_buffer[(x/8)+truey]) {
+                	unsigned mask = 0x80 >> ((x & 7) * 1);
+                	graphics_buffer[(x/8)+truey] &= ~mask;
+				}
+            }
+        }
+	}
 }
 
 void init_graphics() {
