@@ -27,6 +27,7 @@ extern "C" void set_protected_mode();
 extern "C" void jump_to_protected_mode();
 extern "C" void enableA20();
 extern "C" void EnableSSE();
+extern "C" void enable_unreal();
 
 uint8_t prev_key = 0;
 
@@ -53,6 +54,8 @@ extern "C" void loader_c() {
     }
     print_string("Enabling SSE...\n\r");
     EnableSSE();
+    print_string("Entering Unreal mode...\n\r");
+    enable_unreal();
     print_string("Enabling A20 line...\n\r");
     enableA20();
     print_string("Loading Kernel from disk ...\n\r");

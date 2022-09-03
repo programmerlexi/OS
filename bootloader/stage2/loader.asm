@@ -285,6 +285,23 @@ EnableSSE:
     call print_string
     jmp $
 
+[global enable_unreal]
+enable_unreal:
+    cli
+    push ds
+    lgdt [GDT_descriptor]
+    mov eax, cr0
+    or al, 1
+    mov cr0, eax
+    jmp $+2 ; avoid crashing the cpu (386 and 486)
+    mov  bx, DATA_SEG
+    mov  ds, bx
+    and al,0xFE
+    mov  cr0, eax
+    pop ds
+    sti
+    ret
+
 stage2_string: db "Reached Stage 2!", 0xD, 0xA, 0
 memory: db "Running memory detection!", 0xD, 0xA, 0
 finished_memory: db "Finished memory detection!", 0xD, 0xA, 0
