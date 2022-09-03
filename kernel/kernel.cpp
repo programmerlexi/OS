@@ -294,10 +294,15 @@ void kernel_init() {
     init_vga(); // Initialize VGA
     vga_graphics::init_graphics();
     if (get_boot_info()->splash_screen) {
-        vga_graphics::draw_rect(124,74,52,52,LIGHT_BLUE);
+        /*vga_graphics::draw_rect(124,74,52,52,LIGHT_BLUE);
         for (int i = 0; i < 2; i++) {
             vga_graphics::draw_rect(124+((i+1)*16)+(i*2),74,2,52,BLACK);
             vga_graphics::draw_rect(124,74+((i+1)*16)+(i*2),52,2,BLACK);
+        }*/
+        vga_graphics::draw_rect(274,194,92,92,LIGHT_BLUE);
+        for (int i = 0; i < 2; i++) {
+            vga_graphics::draw_rect(274+((i+1)*28)+(i*4),194,4,92,BLACK);
+            vga_graphics::draw_rect(274,194+((i+1)*28)+(i*4),92,4,BLACK);
         }
     } else {
         switch_to_text_mode();
@@ -342,7 +347,7 @@ void kernel_init() {
     slave_rdy = identify_ata(0xB0);
     print_string("Initialization complete!\n\r");
     print_string("Welcome to the Kernel!\n\r");
-    beep();
+    beep(); // Beep aka the sound test
     if (get_boot_info()->splash_screen) {
         switch_to_text_mode();
     }

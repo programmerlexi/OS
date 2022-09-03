@@ -43,6 +43,11 @@ Miscellaneous Output
 /* General Control and Status Registers */
 #define	GRAPHICS_INSTAT_READ 0x3DA
 
+#define	peekb(S,O)		*(unsigned char *)(16uL * (S) + (O))
+#define	pokeb(S,O,V)		*(unsigned char *)(16uL * (S) + (O)) = (V)
+#define	pokew(S,O,V)		*(unsigned short *)(16uL * (S) + (O)) = (V)
+#define	_vmemwr(DS,DO,S,N)	memcpy((char *)((DS) * 16 + (DO)), S, N)
+
 enum Color {
     BLACK, //0x0
     BLUE,  //0x1
@@ -81,8 +86,16 @@ void color_rect(unsigned int x, unsigned int y, unsigned int width, unsigned int
 void switch_to_text_mode();
 static unsigned get_fb_seg();
 namespace vga_graphics {
+    typedef struct graphics_driver {
+        uint64_t width, height;
+        uint8_t* registers;
+        void* putpixel;
+        bool direct;
+    } graphics_driver_t;
+    graphics_driver_t driver;
     void init_graphics();
     void switch_to_graphics_mode();
-    void putpixel(uint16_t x, uint16_t y, uint8_t color);
-    void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint8_t color);
+    void putpixel(uint32_t x, uint32_t y, uint32_t color);
+    void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
+    void set_mode(uint64_t idx);
 }
