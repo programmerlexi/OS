@@ -186,8 +186,10 @@ void clear_screen() {
             for (uint32_t y = 0; y < driver.height; y++) {
                 uint32_t truey = (y*wd_in_bytes);
                 for (uint32_t x = 0; x < driver.width; x++) {
-                    unsigned mask = 0x80 >> ((x & 7) * 1);
-                    graphics_buffer[(x/8)+truey] &= ~mask;
+					if (graphics_buffer[(x/8)+truey]) {
+                    	unsigned mask = 0x80 >> ((x & 7) * 1);
+                    	graphics_buffer[(x/8)+truey] &= ~mask;
+					}
                 }
             }
             pmask <<= 1;
