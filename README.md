@@ -22,5 +22,7 @@ OS go brrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr...
 - Sound
 - Splash
 - CPUID
+- Heap
+- Kernel Panic
 ### Usermode (kinda)
 - Terminal with a few commands
