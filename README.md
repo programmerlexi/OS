@@ -24,5 +24,6 @@ OS go brrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr...
 - CPUID
 - Heap
 - Kernel Panic
+- File System
 ### Usermode (kinda)
 - Terminal with a few commands
