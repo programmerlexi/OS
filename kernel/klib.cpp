@@ -10,6 +10,8 @@
 #include "memory/memory.cpp"
 #include "memory/heap.cpp"
 #include "memory/sysmem.cpp"
+#include "paging/allocator.cpp"
+#include "paging/paging.cpp"
 
 #include "services/proc.cpp"
 #include "services/debug.cpp"
@@ -25,7 +27,6 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "services/keyboard.cpp"
 #include "services/scancodeTranslator.cpp"
 #include "services/mouse.cpp"
-#include "paging/paging.cpp"
 }
 #include "disk/disk.cpp"
 #include "ring3/tss.cpp"

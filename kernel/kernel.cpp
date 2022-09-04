@@ -17,6 +17,8 @@ bool is_usermode() {
 #include "memory/memory.h"
 #include "memory/heap.h"
 #include "memory/sysmem.h"
+#include "paging/allocator.h"
+#include "paging/paging.h"
 
 #include "services/proc.h"
 #include "services/debug.h"
@@ -32,7 +34,6 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "services/keyboard.h"
 #include "services/scancodeTranslator.h"
 #include "services/mouse.h"
-#include "paging/paging.h"
 #include "ring3/umode.h"
 }
 #include "disk/disk.h"
