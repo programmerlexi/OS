@@ -1,5 +1,6 @@
 bits 16
 KERNEL_LOCATION equ 0x00006000
+MAPPED_KERNEL_LOCATION equ 0xC0000000
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -26,13 +27,13 @@ stage2:
 [global load_kernel_from_disk]
 load_kernel_from_disk:
     mov bx, KERNEL_LOCATION
-    mov dh, 100
+    mov dh, 90
 
     mov ah, 0x02
     mov al, dh 
     mov ch, 0x00
     mov dh, 0x00
-    mov cl, 0x08
+    mov cl, 0x0a
     mov dl, [0x5004]
     int 0x13
     jnc after_load
@@ -345,6 +346,27 @@ CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
 
 [bits 32]
+[global loadPageDirectory]
+loadPageDirectory:
+    push ebp
+    mov ebp, esp
+    mov eax, [esp+8]
+    mov cr3, eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+[global enablePaging]
+    enablePaging:
+    push ebp
+    mov ebp, esp
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
+    mov esp, ebp
+    pop ebp
+    ret
+
 start_protected_mode:
     ; reset the segments
     mov ax, DATA_SEG
@@ -355,11 +377,14 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0xf0000 ; maximum stack size
+	mov ebp, 0x6000 ; maximum stack size
 	mov esp, ebp
     
+    [extern boot_bits32]
+    call boot_bits32
+
     ; print a smiley to indicate that we have reached Protected Mode
     mov ax, 0x0f01
     mov [0xb8000], ax
-    jmp KERNEL_LOCATION
+    jmp MAPPED_KERNEL_LOCATION
     jmp $
