@@ -173,24 +173,11 @@ static void set_plane(unsigned p)
 void clear_screen() {
     unsigned wd_in_bytes = driver.width / 8;
     if (driver.direct) {
-        for (uint32_t y = 0; y < driver.height; y++) {
-            uint32_t truey = (y*driver.width);
-            for (uint32_t x = 0; x < driver.width; x++) {
-                graphics_buffer[x+truey] = 0;
-            }
-        }
+        memset(graphics_buffer,0,driver.width*driver.height);
     } else {
         for (int i = 0; i < 4; i++) {
             set_plane(i);
-            for (uint32_t y = 0; y < driver.height; y++) {
-                uint32_t truey = (y*wd_in_bytes);
-                for (uint32_t x = 0; x < driver.width; x++) {
-					if (graphics_buffer[(x/8)+truey]) {
-                    	unsigned mask = 0x80 >> ((x & 7) * 1);
-                    	graphics_buffer[(x/8)+truey] &= ~mask;
-					}
-                }
-            }
+			memset(graphics_buffer,0,driver.height*wd_in_bytes);
         }
     }
 }
@@ -227,9 +214,30 @@ void g_640x480x16_putpixel(uint32_t x, uint32_t y, uint32_t color) {
 }
 
 void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color) {
-    for (uint64_t i = 0; i < height; i++) {
-        for (uint64_t j = 0; j < width; j++) {
-            putpixel(x + j, y + i, color);
+    if (driver.direct) {
+        for (uint64_t i = 0; i < height; i++) {
+            for (uint64_t j = 0; j < width; j++) {
+                putpixel(x + j, y + i, color);
+            }
+        }
+    } else {
+        uint32_t wd_in_bytes = driver.width / 8;
+        uint32_t off;
+        uint16_t pmask = 1;
+	    for (int i = 0; i < 4; i++) {
+            set_plane(i);
+            for (uint64_t j = 0; j < height; j++) {
+                for (uint64_t k = 0; k < width; k++) {
+                    uint32_t mask = 0x80 >> ((x+k)&7);
+                    off = (wd_in_bytes * (j+y)) + ((x+k) / 8);
+                    if (color & pmask) {
+                        graphics_buffer[off] |= mask;
+                    } else {
+                        graphics_buffer[off] &= ~mask;
+                    }
+                }
+            }
+            pmask <<= 1;
         }
     }
 }
@@ -276,15 +284,6 @@ void scroll_down(int value) {
 	for (int p = 0; p < 4; p++) {
 		set_plane(p);
 		memcpy(graphics_buffer,graphics_buffer+(value*driver.width),(driver.width*driver.height)-(value*driver.width));
-		for (uint32_t y = driver.height-value; y < driver.height; y++) {
-            uint32_t truey = (y*(driver.width/8));
-            for (uint32_t x = 0; x < driver.width; x++) {
-				if (graphics_buffer[(x/8)+truey]) {
-                	unsigned mask = 0x80 >> ((x & 7) * 1);
-                	graphics_buffer[(x/8)+truey] &= ~mask;
-				}
-            }
-        }
 	}
 }
 
