@@ -58,7 +58,7 @@ typedef struct {
     pde entries[TABLES_PER_DIRECTORY];
 } page_directory;
 
-extern "C" void loadPageDirectory(page_directory*);
+extern "C" void loadPageDirectory(pde*);
 extern "C" void enablePaging();
 
 pde current_page_directory[TABLES_PER_DIRECTORY] __attribute__((aligned(4096)));

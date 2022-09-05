@@ -17,7 +17,7 @@ main:
 	int 0x10
 
     mov bx, STAGE2_LOCATION
-    mov dh, 8
+    mov dh, 7
 
     mov ah, 0x02
     mov al, dh 

@@ -1,6 +1,5 @@
 bits 16
 KERNEL_LOCATION equ 0x00006000
-MAPPED_KERNEL_LOCATION equ 0xC0000000
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -33,7 +32,7 @@ load_kernel_from_disk:
     mov al, dh 
     mov ch, 0x00
     mov dh, 0x00
-    mov cl, 0x0a
+    mov cl, 0x09
     mov dl, [0x5004]
     int 0x13
     jnc after_load
@@ -377,7 +376,7 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0x6000 ; maximum stack size
+	mov ebp, 0xf0000 ; maximum stack size
 	mov esp, ebp
     
     [extern boot_bits32]
@@ -386,5 +385,5 @@ start_protected_mode:
     ; print a smiley to indicate that we have reached Protected Mode
     mov ax, 0x0f01
     mov [0xb8000], ax
-    jmp MAPPED_KERNEL_LOCATION
+    jmp KERNEL_LOCATION
     jmp $

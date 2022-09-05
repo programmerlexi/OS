@@ -23,11 +23,11 @@ void init_paging() {
         SET_FRAME(&page,frame);
         table->entries[PT_INDEX(virt)] = page;
     }
-
-    pde *entry = &dir->entries[PD_INDEX(0x00000000)];
-    SET_ATTRIBUTE(entry,PDE_PRESENT);
-    SET_ATTRIBUTE(entry,PDE_READ_WRITE);
-    SET_FRAME(entry,(paddr)table);
+    pde entry = 0;
+    SET_ATTRIBUTE(&entry,PDE_PRESENT);
+    SET_ATTRIBUTE(&entry,PDE_READ_WRITE);
+    SET_FRAME(&entry,(paddr)table);
+    dir->entries[0] = entry;
 
     set_page_directory(dir);
     //loadPageDirectory(current_page_directory);
@@ -66,7 +66,7 @@ void *allocate_page(pte *page) {
 
 bool set_page_directory(page_directory *pd) {
     if (!pd) return false;
-    loadPageDirectory(pd);
+    loadPageDirectory(pd->entries);
     return true;
 }
 

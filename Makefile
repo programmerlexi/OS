@@ -1,15 +1,12 @@
-all: run
+all: run clean
 
 cleanObjs:
-	echo "Cleaning Object Files"
 	rm -rf objs/*
 
 cleanBins:
-	echo "Cleaning Binaries"
 	rm -rf bins/*
 
 cleanImgs:
-	echo "Cleaning Images"
 	rm -rf images/*
 
 clean: cleanObjs cleanBins
@@ -23,7 +20,7 @@ objs/kernel_entry.o:
 	nasm -f elf kernel/kernel_entry.asm -o objs/kernel_entry.o
 
 bins/full_kernel.bin: objs/kernel_entry.o objs/kernel.o
-	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0xC0000000 objs/kernel_entry.o objs/kernel.o --oformat binary
+	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0x00006000 objs/kernel_entry.o objs/kernel.o --oformat binary
 
 kernel: bins/full_kernel.bin
 
@@ -55,19 +52,15 @@ bins/zeroes.bin:
 bootloader: bins/boot.bin bins/stage2.bin bins/zeroes.bin
 
 image: bootloader kernel
-	echo "Generating image"
 	cat bins/boot.bin bins/stage2.bin bins/full_kernel.bin bins/zeroes.bin  > images/OS.bin
 
 iso: image
-	echo "Generating ISO"
 	cat images/OS.bin > images/OS.iso
 
 run: image
-	echo "Launching"
 	qemu-system-i386 images/OS.bin -m 4G -soundhw pcspk
 
 kvm: image
-	echo "Launching KVM"
 	kvm-spice images/OS.bin -soundhw pcspk
 #096M
 
