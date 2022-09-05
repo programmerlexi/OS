@@ -189,21 +189,10 @@ void load_text_registers() {
 	outb(GRAPHICS_AC_INDEX, 0x20);
 
     write_font(g_8x16_font,16);
-
-    /*pokew(0x40, 0x4A, 80);	// columns on screen
-	pokew(0x40, 0x4C, 80 * 25 * 2); // framebuffer size
-	pokew(0x40, 0x50, 0);		// cursor pos'n
-	pokeb(0x40, 0x60, 16 - 1);	// cursor shape
-	pokeb(0x40, 0x61, 16 - 2);
-	pokeb(0x40, 0x84, 25 - 1);	// rows on screen - 1
-	pokeb(0x40, 0x85, 16);		// char height */
 }
 
 void init_vga() {
-    //vgaBackBuffer = (char*)malloc(4800*sizeof(char));
 	switch_to_text_mode();
-    /*vgaBuffer = (char*)0xb8000;
-    clear_screen();*/
 }
 
 void set_cursor_pos(uint64_t pos) {

@@ -16,7 +16,7 @@
 #define SET_ATTRIBUTE(entry,attr) (*entry |= attr)
 #define CLEAR_ATTRIBUTE(entry,attr) (*entry &= ~attr)
 #define TEST_ATTRIBUTE(entry,attr) (*entry & attr)
-#define SET_FRAME(entry,addr) (*entry = (*entry & ~0x7FFFF000) | addr)
+#define SET_FRAME(entry,addr) (*entry = (*entry & ~0x7FFFF000) | (addr & 0x7FFFF000))
 
 typedef uint32_t pde;
 typedef uint32_t pte;
@@ -52,18 +52,17 @@ typedef enum {
 
 typedef struct {
     pte entries[PAGES_PER_TABLE];
-} page_table __attribute__((aligned(4096)));
+} page_table;
 
 typedef struct {
     pde entries[TABLES_PER_DIRECTORY];
-} page_directory __attribute__((aligned(4096)));
+} page_directory;
 
 extern "C" void loadPageDirectory(page_directory*);
 extern "C" void enablePaging();
 
-pde current_page_directory[TABLES_PER_DIRECTORY];
-pte paging_table[PAGES_PER_TABLE];
-pte paging_table3G[PAGES_PER_TABLE];
+pde current_page_directory[TABLES_PER_DIRECTORY] __attribute__((aligned(4096)));
+pte paging_table[PAGES_PER_TABLE] __attribute__((aligned(4096)));
 
 
 void init_paging();
@@ -71,7 +70,6 @@ pte *get_pt_entry(page_table *pt, vaddr virtual_address);
 pde *get_pd_entry(page_directory *pd, vaddr virtual_address);
 pte *get_page(const vaddr addr);
 void *allocate_page(pte *page);
-void *allocate_blocks(uint8_t blocks);
 bool set_page_directory(page_directory *pd);
 void flush_tlb_entry(vaddr addr);
 bool map_page(void* physicaladdr, void* virtualaddr);

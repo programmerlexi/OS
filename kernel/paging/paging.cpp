@@ -14,34 +14,20 @@ void init_paging() {
         dir->entries[i] = 0x02;
     }
     page_table *table = (page_table*)paging_table;
-    page_table *table3G = (page_table*)paging_table3G;
     if (!table) kpanic("Out of memory", get_regs());
-    if (!table3G) kpanic("Out of memory", get_regs());
-    memset(table3G,0,sizeof(page_table));
     memset(table,0,sizeof(page_table));
     for (uint32_t i = 0, frame = 0x0, virt = 0x0; i<PAGES_PER_TABLE; i++, frame+=PAGE_SIZE, virt += PAGE_SIZE) {
         pte page = 0;
         SET_ATTRIBUTE(&page,PTE_PRESENT);
         SET_ATTRIBUTE(&page,PTE_READ_WRITE);
         SET_FRAME(&page,frame);
-        table3G->entries[PT_INDEX(virt)] = page;
-    }
-    for (uint32_t i = 0, frame = 0x6000, virt = 0xC0000000; i<PAGES_PER_TABLE; i++, frame+=PAGE_SIZE, virt += PAGE_SIZE) {
-        pte page = 0;
-        SET_ATTRIBUTE(&page,PTE_PRESENT);
-        SET_ATTRIBUTE(&page,PTE_READ_WRITE);
-        SET_FRAME(&page,frame);
         table->entries[PT_INDEX(virt)] = page;
     }
-    /*pde *entry = &dir->entries[PD_INDEX(0xC0000000)];
+
+    pde *entry = &dir->entries[PD_INDEX(0x00000000)];
     SET_ATTRIBUTE(entry,PDE_PRESENT);
     SET_ATTRIBUTE(entry,PDE_READ_WRITE);
-    SET_FRAME(entry,(paddr)table);*/
-
-    pde *entry2 = &dir->entries[PD_INDEX(0x00000000)];
-    SET_ATTRIBUTE(entry2,PDE_PRESENT);
-    SET_ATTRIBUTE(entry2,PDE_READ_WRITE);
-    SET_FRAME(entry2,(paddr)table3G);
+    SET_FRAME(entry,(paddr)table);
 
     set_page_directory(dir);
     //loadPageDirectory(current_page_directory);
@@ -67,7 +53,7 @@ pte *get_page(const vaddr addr) {
 }
 
 void *allocate_page(pte *page) {
-    void *block = allocate_blocks(1);
+    void *block = malloc(1024*4);
     if (block) {
         // Map page to block
         SET_FRAME(page,(paddr)block);
@@ -92,7 +78,7 @@ bool map_page(void *physicaladdr, void *virtualaddr) {
     page_directory *pd = (page_directory*)current_page_directory;
     pde *entry = &pd->entries[PD_INDEX((uint32_t)virtualaddr)];
     if (!TEST_ATTRIBUTE(entry,PDE_PRESENT)) {
-        page_table *table = (page_table*)allocate_blocks(1);
+        page_table *table = (page_table*)malloc(1024*4);
         if (!table) kpanic("Out of memory", get_regs());
         memset(table,0,sizeof(page_table));
         pde *entry = &pd->entries[PD_INDEX((uint32_t)virtualaddr)];
