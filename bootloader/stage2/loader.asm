@@ -296,8 +296,8 @@ enable_unreal:
     jmp $+2 ; avoid crashing the cpu (386 and 486)
     mov  bx, DATA_SEG
     mov  ds, bx
-    and al,0xFE
-    mov  cr0, eax
+    and al, 0xFE
+    mov cr0, eax
     pop ds
     sti
     ret
@@ -312,7 +312,6 @@ a20_activation_failed: db "A20 failed!", 0
 a20_enabled: db "A20 enabled!", 0xD, 0xA, 0
 good: db "Success!", 0xD, 0xA, 0
 sse_unavailable: db "SSE is unavailable!", 0
-
 
 GDT_start:                          ; must be at the end of real mode code
     GDT_null:
