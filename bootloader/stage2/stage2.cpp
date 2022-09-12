@@ -62,7 +62,7 @@ extern "C" void loader_c() {
     load_kernel_from_disk();
     print_string("Loading GDT...\n\r");
     load_gdt();
-    print_string("Setting Protected Mode...\n\r");
+    print_string("Entering Protected Mode...\n\r");
     set_protected_mode();
     jump_to_protected_mode();
 }
