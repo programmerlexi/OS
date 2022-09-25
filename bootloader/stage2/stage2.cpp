@@ -34,10 +34,10 @@ uint8_t prev_key = 0;
 extern "C" void loader_c() {
     print_string("Reached loader_c!\n\r");
     print_string("You can type anything here\n\r");
-    print_string("Press ENTER to boot, '.' to toggle splash (default: on) or ESC to reboot...\n\r");
+    print_string("Press ENTER to boot, '.' to toggle splash (default: off) or ESC to reboot...\n\r");
     uint8_t key = 0;
     bool* splash = (bool*)0x5005;
-    *splash = true;
+    *splash = false;
     while ((key = get_input_keycode()) != 0x1C) {
         if (!(prev_key == key)) {
             if (key == 0x01) {
@@ -54,10 +54,10 @@ extern "C" void loader_c() {
     }
     print_string("Enabling SSE...\n\r");
     EnableSSE();
-    print_string("Entering Unreal mode...\n\r");
-    enable_unreal();
     print_string("Enabling A20 line...\n\r");
     enableA20();
+    print_string("Entering Unreal mode...\n\r");
+    enable_unreal();
     print_string("Loading Kernel from disk ...\n\r");
     load_kernel_from_disk();
     print_string("Loading GDT...\n\r");

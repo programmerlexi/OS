@@ -352,7 +352,7 @@ void kernel_init() {
     print_string("Welcome to the Kernel!\n\r");
     beep(); // Beep aka the sound test
     if (get_boot_info()->splash_screen) {
-        //switch_to_text_mode();
+        switch_to_text_mode();
     }
     exit_debug_scope();
 }

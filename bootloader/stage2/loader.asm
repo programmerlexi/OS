@@ -344,27 +344,6 @@ CODE_SEG equ GDT_code - GDT_start
 DATA_SEG equ GDT_data - GDT_start
 
 [bits 32]
-[global loadPageDirectory]
-loadPageDirectory:
-    push ebp
-    mov ebp, esp
-    mov eax, [esp+8]
-    mov cr3, eax
-    mov esp, ebp
-    pop ebp
-    ret
-
-[global enablePaging]
-    enablePaging:
-    push ebp
-    mov ebp, esp
-    mov eax, cr0
-    or eax, 0x80000000
-    mov cr0, eax
-    mov esp, ebp
-    pop ebp
-    ret
-
 start_protected_mode:
     ; reset the segments
     mov ax, DATA_SEG
@@ -381,8 +360,5 @@ start_protected_mode:
     [extern boot_bits32]
     call boot_bits32
 
-    ; print a smiley to indicate that we have reached Protected Mode
-    mov ax, 0x0f01
-    mov [0xb8000], ax
     jmp KERNEL_LOCATION
     jmp $
