@@ -3,6 +3,7 @@
 #include "../utils/util.h"
 #include "../memory/memory.h"
 #include "../memory/heap.h"
+#include "bitmap.h"
 
 uint8_t c_width;
 uint8_t c_height;
