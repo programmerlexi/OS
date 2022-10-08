@@ -22,10 +22,10 @@ switchTask:
     mov esi, [esp+16]
     mov edi, [esp+4]
     mov [eax], ebx
-    mov [eax+24], ebx
-    mov [eax+28], ebx
-    mov [eax+32], ebx
-    mov [eax+36], ebx
+    mov [eax+24], edx
+    mov [eax+28], esi
+    mov [eax+32], ecx
+    mov [eax+36], edi
     pop ebx
     mov [eax+40], ebx
     push ebx
