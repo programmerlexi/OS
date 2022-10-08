@@ -48,7 +48,7 @@ switchTask:
     pop eax
     push eax
     mov eax, [esp+32]
-    xchg eax, [tmp]
+    xchg eax, [esp]
     mov eax, [eax]
     ret ; return to the other task
 
