@@ -20,7 +20,7 @@ objs/kernel_entry.o:
 	nasm -f elf kernel/kernel_entry.asm -o objs/kernel_entry.o
 
 bins/full_kernel.bin: objs/kernel_entry.o objs/kernel.o
-	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0x00006000 objs/kernel_entry.o objs/kernel.o --oformat binary
+	/usr/local/i386elfgcc/bin/i386-elf-ld -m elf_i386 -o bins/full_kernel.bin -Ttext 0x00007c00 objs/kernel_entry.o objs/kernel.o --oformat binary
 
 kernel: bins/full_kernel.bin
 

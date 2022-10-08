@@ -45,6 +45,7 @@ extern "C" { // This is so we can import asm stuff from kernel_entry.asm
 #include "fs/fs.h"
 #include "fs/devfs/devfs.h"
 #include "fs/rootfs/rootfs.h"
+#include "proc/task.h"
 
 void kernel_test();
 
@@ -337,11 +338,11 @@ void kernel_init() {
     print_string("Installing keyboard!\r");
     kb_install(); // Install the keyboard handler
     print_string("[OK] Keyboard installed!\n\r");
-    print_string("Installing mouse!\r");
+    /*print_string("Installing mouse!\r");
     mouse_install(); // Install the mouse handler
     enable_mouse(); // Enable the mouse
     proc_create((void*)process_mouse_packet,"mouse"); // Create a process to handle the mouse packets
-    print_string("[OK] Mouse installed!\n\r");
+    print_string("[OK] Mouse installed!\n\r");*/
     print_string("Performing Timer Self Test!\n\r");
     timer_self_test();
     print_string("Identifying Master ATA.\n\r");
@@ -366,7 +367,7 @@ void kernel_test() {
 
 void kernel_main() {
     enter_debug_scope((char*)"kernel_main");
-    print_time(); // Print the time
+    /*print_time(); // Print the time
     print_string("\n\r");
     print_string("Running CPU detection!\n\r");
     cpu_detect(); // Detect the CPU
@@ -393,9 +394,11 @@ void kernel_main() {
     print_string("Master Drive Ready: ");
     print_string(master_rdy ? "Yes\n\r" : "No\n\r");
     print_string("Slave Drive Ready: ");
-    print_string(slave_rdy ? "Yes\n\r" : "No\n\r");
-    terminal_init(); // Initialize the terminal
-    proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
+    print_string(slave_rdy ? "Yes\n\r" : "No\n\r");*/
+    //terminal_init(); // Initialize the terminal
+    //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
+    initTasking();
+    doIt();
     exit_debug_scope();
 }
 

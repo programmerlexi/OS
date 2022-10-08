@@ -1,5 +1,5 @@
 bits 16
-KERNEL_LOCATION equ 0x00006000
+KERNEL_LOCATION equ 0x00007c00
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -26,7 +26,7 @@ stage2:
 [global load_kernel_from_disk]
 load_kernel_from_disk:
     mov bx, KERNEL_LOCATION
-    mov dh, 90
+    mov dh, 98
 
     mov ah, 0x02
     mov al, dh 
