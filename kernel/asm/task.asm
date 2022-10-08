@@ -48,6 +48,8 @@ switchTask:
     pop eax
     push eax
     mov eax, [esp+32]
-    xchg eax, [esp]
+    xchg eax, [tmp]
     mov eax, [eax]
     ret ; return to the other task
+
+tmp: dd 0
