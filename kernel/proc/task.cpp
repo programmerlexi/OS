@@ -40,6 +40,7 @@ void initTasking() {
 
 void broken_process() {
     print_string("Broken Process\n\r");
+    yield();
     for (;;);
 }
 
