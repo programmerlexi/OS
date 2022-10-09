@@ -12,7 +12,7 @@ static void otherMain() {
     print_string("Hello multitasking world!\n\r"); // Not implemented here...
     yield();
     print_string("Back in otherTask we are again!\n\r");
-    //yield();
+    yield();
 }
 
 static void yetAnother() {
