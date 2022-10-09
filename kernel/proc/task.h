@@ -16,6 +16,7 @@ typedef struct Task {
  
 extern void initTasking();
 extern void createTask(Task*, void(*)(), uint32_t, uint32_t*);
+extern void fork(Task* task, void(*func)());
  
 extern void yield(); // Switch task frontend
 extern "C" void switchTask(Registers*, Registers*); // The function which actually switches
