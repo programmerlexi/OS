@@ -7,12 +7,12 @@ static Task *runningTask;
 static Task mainTask;
 static Task otherTask;
 static Task yetAnotherTask;
- 
+
 static void otherMain() {
     print_string("Hello multitasking world!\n\r"); // Not implemented here...
     yield();
     print_string("Back in otherTask we are again!\n\r");
-    yield();
+    //yield();
 }
 
 static void yetAnother() {
@@ -38,9 +38,15 @@ void initTasking() {
     exit_debug_scope();
 }
 
+void broken_process() {
+    print_string("Broken Process\n\r");
+    for (;;);
+}
+
 uint64_t prev_stack = 0x300000;
 void* allocateStack() {
     prev_stack = prev_stack + 0x1000;
+    *(uint32_t*)(prev_stack - 4) = (uint32_t)&broken_process;
     return (void*)prev_stack;
 }
 
@@ -54,8 +60,8 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.eflags = flags;
     task->regs.eip = (uint32_t) main;
     task->regs.cr3 = (uint32_t) pagedir;
-    task->regs.esp = (uint32_t) allocateStack(); // Not implemented here
-    task->regs.ebp = task->regs.esp;
+    task->regs.esp = (uint32_t) allocateStack()-4; // Not implemented here
+    task->regs.ebp = task->regs.esp+4;
     task->next = 0;
 }
  
