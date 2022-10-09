@@ -13,6 +13,7 @@ typedef struct Task {
     Registers regs;
     struct Task *next;
     bool running;
+    uint64_t tid;
 } Task;
  
 extern void initTasking();

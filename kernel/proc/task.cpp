@@ -2,7 +2,10 @@
 
 #include "task.h"
 #include "../gatr/vga.h"
+#include "../services/debug.h"
  
+uint64_t newest_tid = 1; // Newest Task ID
+
 static Task *runningTask;
 static Task mainTask;
 static Task otherTask;
@@ -15,6 +18,7 @@ void fork(Task* task, void(*func)()) {
 }
 
 void quit() {
+    if (runningTask->tid == 0) kpanic("Something went wrong, the kernel is gone!",get_regs());
     runningTask->running = false;
     Task* current = runningTask;
     while (1) {
@@ -31,7 +35,7 @@ static void yetAnother() {
     print_string("Forked from otherMain!\n\r");
     yield();
     print_string("And to anotherTask!\n\r");
-    yield();
+    quit();
 }
 
 static void otherMain() {
@@ -39,7 +43,7 @@ static void otherMain() {
     fork(&yetAnotherTask, yetAnother);
     yield();
     print_string("Back in otherTask we are again!\n\r");
-    yield();
+    quit();
 }
 
 void initTasking() {
@@ -47,6 +51,7 @@ void initTasking() {
     // Get EFLAGS and CR3
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(mainTask.regs.cr3)::"%eax");
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
+    mainTask.tid = 0;
  
     createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
     //createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
@@ -60,7 +65,7 @@ void initTasking() {
 
 void broken_process() {
     print_string("Broken Process\n\r");
-    yield();
+    quit(); // Remove the broken process
     for (;;);
 }
 
@@ -85,6 +90,8 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.ebp = task->regs.esp+4;
     task->next = 0;
     task->running = true;
+    task->tid = newest_tid;
+    newest_tid++;
 }
  
 void yield() {
@@ -99,4 +106,5 @@ void doIt() {
     print_string("Returned to mainTask!\n\r");
     yield();
     print_string("Welcome back!\n\r");
+    quit(); // Delete the kernel
 }
