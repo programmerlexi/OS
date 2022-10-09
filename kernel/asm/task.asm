@@ -3,7 +3,7 @@ global switchTask
 ; This function saves the registers of the current task,
 ; loads the registers of the next task,
 ; then overwrites the return address
-; and returns.
+; and returns to overwrite eip.
 switchTask: 
     pusha
     pushf
@@ -44,10 +44,10 @@ switchTask:
     mov esp, [eax+24]
     push eax
     mov eax, [eax+40]
-    mov eax, cr3
+    mov cr3, eax
     pop eax
     push eax
-    mov eax, [esp+32]
+    mov eax, [eax+32]
     xchg eax, [esp]
     mov eax, [eax]
     ret ; return to the other task

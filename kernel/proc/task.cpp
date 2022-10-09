@@ -10,6 +10,8 @@ static Task otherTask;
 static void otherMain() {
     print_string("Hello multitasking world!\n\r"); // Not implemented here...
     yield();
+    print_string("Back in otherTask we are again!\n\r");
+    yield();
 }
  
 void initTasking() {
@@ -56,5 +58,7 @@ void yield() {
 void doIt() {
     print_string("Switching to otherTask... \n\r");
     yield();
-    print_string("Returned to mainTask!\n");
+    print_string("Returned to mainTask!\n\r");
+    yield();
+    print_string("Welcome back!\n\r");
 }
