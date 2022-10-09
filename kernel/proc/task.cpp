@@ -14,6 +14,19 @@ void fork(Task* task, void(*func)()) {
     runningTask->next = task;
 }
 
+void quit() {
+    runningTask->running = false;
+    Task* current = runningTask;
+    while (1) {
+        if (current->next == runningTask) {
+            current->next = runningTask->next;
+            break;
+        }
+        current = current->next;
+    }
+    yield();
+}
+
 static void yetAnother() {
     print_string("Forked from otherMain!\n\r");
     yield();
@@ -71,6 +84,7 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.esp = (uint32_t) allocateStack()-4; // Not implemented here
     task->regs.ebp = task->regs.esp+4;
     task->next = 0;
+    task->running = true;
 }
  
 void yield() {

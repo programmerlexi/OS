@@ -12,6 +12,7 @@ typedef struct {
 typedef struct Task {
     Registers regs;
     struct Task *next;
+    bool running;
 } Task;
  
 extern void initTasking();
