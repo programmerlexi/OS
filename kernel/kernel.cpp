@@ -399,6 +399,7 @@ void kernel_main() {
     //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     initTasking();
     doIt();
+    print_string("Finished task execution!\n\r");
     exit_debug_scope();
 }
 
