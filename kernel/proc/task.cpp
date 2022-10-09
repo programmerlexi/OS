@@ -6,6 +6,7 @@
 static Task *runningTask;
 static Task mainTask;
 static Task otherTask;
+static Task yetAnotherTask;
  
 static void otherMain() {
     print_string("Hello multitasking world!\n\r"); // Not implemented here...
@@ -13,7 +14,14 @@ static void otherMain() {
     print_string("Back in otherTask we are again!\n\r");
     yield();
 }
- 
+
+static void yetAnother() {
+    print_string("This is quite awesome!\n\r");
+    yield();
+    print_string("And to anotherTask!\n\r");
+    yield();
+}
+
 void initTasking() {
     enter_debug_scope((char*)"init_tasking");
     // Get EFLAGS and CR3
@@ -21,8 +29,10 @@ void initTasking() {
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
  
     createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
+    createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
     mainTask.next = &otherTask;
-    otherTask.next = &mainTask;
+    otherTask.next = &yetAnotherTask;
+    yetAnotherTask.next = &mainTask;
  
     runningTask = &mainTask;
     exit_debug_scope();
