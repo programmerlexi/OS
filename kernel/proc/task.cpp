@@ -8,17 +8,24 @@ static Task mainTask;
 static Task otherTask;
 static Task yetAnotherTask;
 
-static void otherMain() {
-    print_string("Hello multitasking world!\n\r"); // Not implemented here...
-    yield();
-    print_string("Back in otherTask we are again!\n\r");
-    yield();
+void fork(Task* task, void(*func)()) {
+    createTask(task,func,runningTask->regs.eflags,(uint32_t*)mainTask.regs.cr3);
+    task->next = runningTask->next;
+    runningTask->next = task;
 }
 
 static void yetAnother() {
-    print_string("This is quite awesome!\n\r");
+    print_string("Forked from otherMain!\n\r");
     yield();
     print_string("And to anotherTask!\n\r");
+    yield();
+}
+
+static void otherMain() {
+    print_string("Hello multitasking world!\n\r"); // Not implemented here...
+    fork(&yetAnotherTask, yetAnother);
+    yield();
+    print_string("Back in otherTask we are again!\n\r");
     yield();
 }
 
@@ -29,10 +36,10 @@ void initTasking() {
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
  
     createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
-    createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
+    //createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
     mainTask.next = &otherTask;
-    otherTask.next = &yetAnotherTask;
-    yetAnotherTask.next = &mainTask;
+    otherTask.next = &mainTask;
+    //yetAnotherTask.next = &mainTask;
  
     runningTask = &mainTask;
     exit_debug_scope();
