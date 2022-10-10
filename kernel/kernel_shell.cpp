@@ -77,6 +77,11 @@ void terminal_init() {
     printed = false;
     enter_pressed_before = false;
     started = false;
+    while (1) {
+        lock_scheduler();
+        terminal_loop();
+        unlock_scheduler();
+    }
 }
 
 char* usr;
@@ -131,19 +136,16 @@ void terminal_loop() {
             set_input(false);
             if (strcmp(input, "help")) {
                 enter_debug_scope((char*)"help");
-                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)help,"help");
                 exit_debug_scope();
             } else if (strcmp(input, "user")) {
                 enter_debug_scope((char*)"user");
-                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)user,"user");
                 exit_debug_scope();
             } else if (strcmp(input, "shutdown")) {
                 enter_debug_scope((char*)"shutdown");
-                proc_wait();
                 started = true;
                 sub_pid = proc_fork((void*)shutdown,"shutdown");
                 exit_debug_scope();
@@ -151,7 +153,7 @@ void terminal_loop() {
                 enter_debug_scope((char*)"exit");
                 print_string("Goodbye!\n\r");
                 set_input(true);
-                proc_quit(0);
+                quit();
                 exit_debug_scope();
                 return;
             } else if (strlen(input) > 0) {

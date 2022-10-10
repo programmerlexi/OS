@@ -23,3 +23,5 @@ extern "C" void irq13();
 extern "C" void irq14();
 extern "C" void irq15();
 void irq_install();
+
+void end_interrupt(regs* r);

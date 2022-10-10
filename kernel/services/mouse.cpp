@@ -106,28 +106,30 @@ void mouse_after_move(bool force) {
 }
 
 void process_mouse_packet() {
-    if (!mouse_packet_ready) return;
-    //print_string("Processing mouse packet...\n\r");
-    mouse_pos_old.x = mouse_pos.x;
-    mouse_pos_old.y = mouse_pos.y;
-    
-    mouse_packet_ready = false;
-    uint8_t xNegative, yNegative, xOverflow, yOverflow;
-    xNegative = mouse_packet[0] & PS2XSIGN;
-    yNegative = mouse_packet[0] & PS2YSIGN;
-    xOverflow = mouse_packet[0] & PS2XOVERFLOW;
-    yOverflow = mouse_packet[0] & PS2YOVERFLOW;
-    
-    mouse_click_handler(mouse_packet[0] & PS2LMB, mouse_packet[0] & PS2RMB, mouse_packet[0] & PS2MMB);
+    while(1) {
+        if (!mouse_packet_ready) continue;
+        print_string("Processing mouse packet...\n\r");
+        mouse_pos_old.x = mouse_pos.x;
+        mouse_pos_old.y = mouse_pos.y;
 
-    if (mouse_start_click) {
-        mouse_pos_start_click.x = mouse_pos.x;
-        mouse_pos_start_click.y = mouse_pos.y;
+        mouse_packet_ready = false;
+        uint8_t xNegative, yNegative, xOverflow, yOverflow;
+        xNegative = mouse_packet[0] & PS2XSIGN;
+        yNegative = mouse_packet[0] & PS2YSIGN;
+        xOverflow = mouse_packet[0] & PS2XOVERFLOW;
+        yOverflow = mouse_packet[0] & PS2YOVERFLOW;
+
+        mouse_click_handler(mouse_packet[0] & PS2LMB, mouse_packet[0] & PS2RMB, mouse_packet[0] & PS2MMB);
+
+        if (mouse_start_click) {
+            mouse_pos_start_click.x = mouse_pos.x;
+            mouse_pos_start_click.y = mouse_pos.y;
+        }
+
+        Point mouse_vector = move_mouse(xNegative, yNegative, xOverflow, yOverflow);
+        repos_mouse(mouse_vector);
+        mouse_after_move(mouse_stop_click);
     }
-
-    Point mouse_vector = move_mouse(xNegative, yNegative, xOverflow, yOverflow);
-    repos_mouse(mouse_vector);
-    mouse_after_move(mouse_stop_click);
 }
 
 void mouse_handler(struct regs *r) {

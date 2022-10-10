@@ -68,9 +68,12 @@ extern "C" void _irq_handler(struct regs *r)
 	if (handler)
 	{
 		handler(r);
+	} else {
+		end_interrupt(r);
 	}
+}
 
-
+void end_interrupt(regs* r) {
 	if (r->int_no >= 40)
 	{
 		outb(0xA0, 0x20);

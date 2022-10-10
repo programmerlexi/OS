@@ -3,18 +3,17 @@
 #include "task.h"
 #include "../gatr/vga.h"
 #include "../services/debug.h"
- 
-uint64_t newest_tid = 1; // Newest Task ID
-
-static Task *runningTask;
-static Task mainTask;
-static Task otherTask;
-static Task yetAnotherTask;
+#include "../memory/heap.h"
 
 void fork(Task* task, void(*func)()) {
     createTask(task,func,runningTask->regs.eflags,(uint32_t*)mainTask.regs.cr3);
     task->next = runningTask->next;
     runningTask->next = task;
+}
+
+void fork(void(*func)()) {
+    Task* t = (Task*)malloc(sizeof(Task));
+    fork(t, func);
 }
 
 void quit() {
@@ -31,32 +30,17 @@ void quit() {
     yield();
 }
 
-static void yetAnother() {
-    print_string("Forked from otherMain!\n\r");
-    yield();
-    print_string("And to anotherTask!\n\r");
-    quit();
-}
-
-static void otherMain() {
-    print_string("Hello multitasking world!\n\r"); // Not implemented here...
-    fork(&yetAnotherTask, yetAnother);
-    yield();
-    print_string("Back in otherTask we are again!\n\r");
-    quit();
-}
-
 void initTasking() {
     enter_debug_scope((char*)"init_tasking");
     // Get EFLAGS and CR3
-    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(mainTask.regs.cr3)::"%eax");
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
+    __asm__ __volatile__("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(mainTask.regs.cr3)::"%eax");
+    __asm__ __volatile__("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
     mainTask.tid = 0;
  
-    createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
+    //createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
     //createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
-    mainTask.next = &otherTask;
-    otherTask.next = &mainTask;
+    mainTask.next = &mainTask;
+    //otherTask.next = &mainTask;
     //yetAnotherTask.next = &mainTask;
  
     runningTask = &mainTask;
@@ -90,21 +74,43 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.ebp = task->regs.esp+4;
     task->next = 0;
     task->running = true;
+    task->time_used = 0;
+    task->state = READY;
     task->tid = newest_tid;
     newest_tid++;
 }
- 
+
+uint64_t irq_lock_counter = 0;
+void lock_scheduler() {
+    asm("cli");
+    irq_lock_counter++;
+}
+
+void unlock_scheduler() {
+    irq_lock_counter--;
+    if (irq_lock_counter == 0) {
+        asm("sti");
+    }
+}
+
 void yield() {
     Task *last = runningTask;
+    last->state = READY;
     runningTask = runningTask->next;
+    while (!(runningTask->state == READY)) {
+        runningTask = runningTask->next;
+    }
+    runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);
 }
 
-void doIt() {
-    print_string("Switching to otherTask... \n\r");
-    yield();
-    print_string("Returned to mainTask!\n\r");
-    yield();
-    print_string("Welcome back!\n\r");
-    quit(); // Delete the kernel
+void schedule() {
+    Task *last = runningTask;
+    last->state = READY;
+    runningTask = runningTask->next;
+    while (runningTask->state != READY && runningTask->state != RUNNING) {
+        runningTask = runningTask->next;
+    }
+    runningTask->state = RUNNING;
+    switchTask(&last->regs, &runningTask->regs);
 }

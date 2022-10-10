@@ -15,7 +15,8 @@ OS go brrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr...
 - IDT
 - ISRs
 - Syscalls
-- Processes
+- Task switching
+- Scheduler
 - Mouse
 - Keyboard
 - HDD
@@ -26,4 +27,4 @@ OS go brrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr...
 - Kernel Panic
 - File System
 ### Usermode (kinda)
-- Terminal with a few commands
+- Terminal with a few commands (to be rewritten for the new task system)

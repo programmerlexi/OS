@@ -51,5 +51,3 @@ switchTask:
     xchg eax, [esp]
     mov eax, [eax]
     ret ; return to the other task
-
-tmp: dd 0
