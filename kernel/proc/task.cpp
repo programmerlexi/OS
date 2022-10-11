@@ -11,9 +11,10 @@ void fork(Task* task, void(*func)()) {
     runningTask->next = task;
 }
 
-void fork(void(*func)()) {
+Task* fork(void(*func)()) {
     Task* t = (Task*)malloc(sizeof(Task));
     fork(t, func);
+    return t;
 }
 
 void quit() {
@@ -36,27 +37,23 @@ void initTasking() {
     __asm__ __volatile__("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(mainTask.regs.cr3)::"%eax");
     __asm__ __volatile__("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(mainTask.regs.eflags)::"%eax");
     mainTask.tid = 0;
- 
-    //createTask(&otherTask, otherMain, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
-    //createTask(&yetAnotherTask, yetAnother, mainTask.regs.eflags, (uint32_t*)mainTask.regs.cr3);
+
     mainTask.next = &mainTask;
-    //otherTask.next = &mainTask;
-    //yetAnotherTask.next = &mainTask;
  
     runningTask = &mainTask;
     exit_debug_scope();
 }
 
-void broken_process() {
-    print_string("Broken Process\n\r");
+void process_end() {
     quit(); // Remove the broken process
     for (;;);
 }
 
 uint64_t prev_stack = 0x300000;
 void* allocateStack() {
-    prev_stack = prev_stack + 0x1000;
-    *(uint32_t*)(prev_stack - 4) = (uint32_t)&broken_process;
+    enter_debug_scope((char*)"stack allocation");
+    prev_stack = prev_stack + 0x2000;
+    *(uint32_t*)(prev_stack - 4) = (uint32_t)&process_end;
     return (void*)prev_stack;
 }
 
@@ -95,22 +92,24 @@ void unlock_scheduler() {
 
 void yield() {
     Task *last = runningTask;
-    last->state = READY;
     runningTask = runningTask->next;
-    while (!(runningTask->state == READY)) {
+    while (runningTask->state != READY && runningTask->state != RUNNING) {
         runningTask = runningTask->next;
     }
+    if (runningTask->state == RUNNING) return; // task already current
+    last->state = READY;
     runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);
 }
 
 void schedule() {
     Task *last = runningTask;
-    last->state = READY;
     runningTask = runningTask->next;
     while (runningTask->state != READY && runningTask->state != RUNNING) {
         runningTask = runningTask->next;
     }
+    if (runningTask->state == RUNNING) return; // task already current
+    last->state = READY;
     runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);
 }

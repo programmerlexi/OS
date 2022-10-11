@@ -3,7 +3,6 @@
 #include "pic.h"
 void keyboard_handler(struct regs *r)
 {
-    lock_scheduler();
     unsigned char scancode;
 
     scancode = inb(DATA_PORT);
@@ -46,7 +45,6 @@ void keyboard_handler(struct regs *r)
         }
         kpressed[scancode] = 1;
     }
-    unlock_scheduler();
     end_interrupt(r);
 }
 

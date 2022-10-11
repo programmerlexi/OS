@@ -50,7 +50,7 @@ void load_programs() {
     build_program(reboot,"reboot","reboot the system");
 }
 
-int sub_pid;
+Task* sub_pid;
 bool started = false;
 bool printed = false;
 bool logged = false;
@@ -78,9 +78,7 @@ void terminal_init() {
     enter_pressed_before = false;
     started = false;
     while (1) {
-        lock_scheduler();
         terminal_loop();
-        unlock_scheduler();
     }
 }
 
@@ -110,10 +108,10 @@ void terminal_loop() {
         }
     }
     if (started) {
-        if (proc_list[sub_pid].state == PROC_DEAD) {
+        if (!sub_pid->running) {
             started = false;
             printed = false;
-            switch (proc_list[sub_pid].exit_code) {
+            switch (0) {
                 case 0:
                     break;
                 case 1:
@@ -137,23 +135,24 @@ void terminal_loop() {
             if (strcmp(input, "help")) {
                 enter_debug_scope((char*)"help");
                 started = true;
-                sub_pid = proc_fork((void*)help,"help");
+                sub_pid = fork(help);
                 exit_debug_scope();
             } else if (strcmp(input, "user")) {
                 enter_debug_scope((char*)"user");
                 started = true;
-                sub_pid = proc_fork((void*)user,"user");
+                sub_pid = fork(user);
                 exit_debug_scope();
             } else if (strcmp(input, "shutdown")) {
                 enter_debug_scope((char*)"shutdown");
                 started = true;
-                sub_pid = proc_fork((void*)shutdown,"shutdown");
+                sub_pid = fork(shutdown);
                 exit_debug_scope();
             } else if (strcmp(input, "exit")) {
                 enter_debug_scope((char*)"exit");
                 print_string("Goodbye!\n\r");
                 set_input(true);
                 quit();
+                return;
                 exit_debug_scope();
                 return;
             } else if (strlen(input) > 0) {
@@ -164,7 +163,7 @@ void terminal_loop() {
                         proc_wait();
                         found = true;
                         started = true;
-                        sub_pid = proc_fork((void*)programs[i].func,(char*)programs[i].name);
+                        sub_pid = fork(programs[i].func);
                         exit_debug_scope();
                         break;
                     }

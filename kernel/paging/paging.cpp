@@ -29,8 +29,11 @@ void init_paging() {
     SET_FRAME(&entry,(paddr)table);
     dir->entries[0] = entry;
 
+    for (uint32_t i = 0, frame = 0x0, virt = 0x0; i<PAGES_PER_TABLE*2; i++, frame+=PAGE_SIZE, virt += PAGE_SIZE) {
+        map_page((void*)frame,(void*)virt);
+    }
+
     set_page_directory(dir);
-    //loadPageDirectory(current_page_directory);
     enablePaging();
 }
 

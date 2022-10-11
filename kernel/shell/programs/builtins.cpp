@@ -9,30 +9,25 @@ void help() {
         print_string(programs[i].description);
         print_string("\n\r");
     }
-    proc_quit(0);
 }
 
 void user() {
     print_string(USER);
     print_string("\n\r");
-    proc_quit(0);
 }
 
 void test() {
     kernel_test();
-    proc_quit(0);
 }
 
 void shutdown() {
     power_shutdown();
-    proc_quit(0);
 }
 
 void clear() {
     enter_debug_scope((char*)"Clearing");
     clear_screen();
     enter_debug_scope((char*)"Exiting");
-    proc_quit(0);
     exit_debug_scope();
 }
 
@@ -48,7 +43,6 @@ void read_sector_one() {
         print_string(" ");
     }
     free(buf);
-    proc_quit(0);
 }
 
 void reboot() {
@@ -91,8 +85,6 @@ void memory() {
     print_string(" segment(s) of ");
     print_string(HexToString((uint64_t)count_segments()));
     print_string(" segment(s) are free\n\r");
-    //print_string("\n\r");
-    proc_quit(0);
 }
 
 void cpu_info() {
@@ -149,5 +141,4 @@ void cpu_info() {
         print_string("FPU ");
     }
     print_string("\n\r");
-    proc_quit(0);
 }

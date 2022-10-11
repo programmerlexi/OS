@@ -1,6 +1,6 @@
 #include "../../services/proc.h"
 void procs() {
-    for (int i = 0; i < 256; i++) {
+    /*for (int i = 0; i < 256; i++) {
         if (proc_list[i].state == PROC_DEAD) continue;
         print_string(num_to_char(proc_list[i].pid));
         print_string(" ");
@@ -24,6 +24,42 @@ void procs() {
                 break;
         }
         print_string("\n\r");
+    }*/
+    Task* task = &mainTask;
+    print_string(num_to_char(task->tid));
+    print_string(" ");
+    switch (task->state) {
+        case 0:
+            print_string("RUNNING");
+            break;
+        case 1:
+            print_string("READY");
+            break;
+        case 2:
+            print_string("SLEEPING");
+            break;
+        default:
+            print_string("Unknown");
     }
-    proc_quit(0);
+    task = task->next;
+    print_string("\n\r");
+    while (task != &mainTask) {
+        print_string(num_to_char(task->tid));
+        print_string(" ");
+        switch (task->state) {
+            case 0:
+                print_string("RUNNING");
+                break;
+            case 1:
+                print_string("READY");
+                break;
+            case 2:
+                print_string("SLEEPING");
+                break;
+            default:
+                print_string("Unknown");
+        }
+        print_string("\n\r");
+        task = task->next;
+    }
 }

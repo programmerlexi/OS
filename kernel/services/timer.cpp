@@ -32,7 +32,7 @@ void timer_install()
 {
     print_string("Installing timer...      \r");
     irq_install_handler(0, timer_handler);
-    timer_phase(1000);
+    timer_phase(100);
 }
 
 uint64_t read_counter() {

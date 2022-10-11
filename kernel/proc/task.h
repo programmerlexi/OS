@@ -29,10 +29,9 @@ uint64_t newest_tid = 1; // Newest Task ID
 static Task *runningTask;
 static Task mainTask;
 
-extern void initTasking();
 extern void createTask(Task*, void(*)(), uint32_t, uint32_t*);
 extern void fork(Task* task, void(*func)());
-extern void fork(void(*func)());
+extern Task* fork(void(*func)());
 extern void quit();
  
 void lock_scheduler();

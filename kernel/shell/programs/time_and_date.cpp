@@ -8,7 +8,6 @@ void time() {
     print_string(":");
     print_string(num_to_char(second));
     print_string("\n\r");
-    proc_quit(0);
 }
 void date() {
     read_rtc();
@@ -18,5 +17,4 @@ void date() {
     print_string("/");
     print_string(num_to_char(year));
     print_string("\n\r");
-    proc_quit(0);
 }
