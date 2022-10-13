@@ -291,9 +291,7 @@ void verify_kernel();
 
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
-    /*if (check_pge()) {
-        init_paging(); // Initialize paging if its available
-    }*/
+    init_paging(); // Initialize paging if its available
     init_gdt(); // Initialize the GDT
     init_heap(0x100000, 0x200000);
     memory_self_test(); // Run memory self-test.

@@ -63,6 +63,8 @@ extern "C" void enablePaging();
 
 pde current_page_directory[TABLES_PER_DIRECTORY] __attribute__((aligned(4096)));
 pte paging_table[PAGES_PER_TABLE] __attribute__((aligned(4096)));
+pte paging_table2[PAGES_PER_TABLE] __attribute__((aligned(4096)));
+pte paging_table3[PAGES_PER_TABLE] __attribute__((aligned(4096)));
 
 
 void init_paging();
