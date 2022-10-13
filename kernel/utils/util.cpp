@@ -110,3 +110,8 @@ char* strcat(char* dest, const char* src, uint32_t length)
     dest[i+dest_length] = src[i];
   return dest;
 }
+uint32_t rdtsc() {
+  uint32_t tsc = 0;
+  asm("rdtsc" : "=a"(tsc));
+  return tsc;
+}

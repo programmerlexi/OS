@@ -22,6 +22,8 @@ typedef struct Task {
     TaskState state;
     uint64_t tid;
     uint64_t time_used;
+    uint8_t quantum;
+    char current_quantum;
 } Task;
  
 uint64_t newest_tid = 1; // Newest Task ID

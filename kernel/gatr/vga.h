@@ -335,6 +335,7 @@ static unsigned char g_8x16_font[4096] =
 uint64_t vga_pos = 0;
 void clear_screen();
 void init_vga();
+void disable_cursor();
 void set_cursor_pos(uint64_t pos);
 void putchar(char c, char colorCode, unsigned int pos);
 uint8_t getchar(unsigned int pos);

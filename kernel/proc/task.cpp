@@ -39,7 +39,8 @@ void initTasking() {
     mainTask.tid = 0;
 
     mainTask.next = &mainTask;
- 
+    mainTask.quantum = 20; // Kernel get extra quantum
+    mainTask.current_quantum = 20; 
     runningTask = &mainTask;
     exit_debug_scope();
 }
@@ -74,6 +75,8 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->time_used = 0;
     task->state = READY;
     task->tid = newest_tid;
+    task->quantum = 10;
+    task->current_quantum = 0;
     newest_tid++;
 }
 
@@ -90,13 +93,17 @@ void unlock_scheduler() {
     }
 }
 
+uint64_t start_time = 0;
 void yield() {
     Task *last = runningTask;
+    last->time_used += timer_ticks - start_time;
+    start_time = timer_ticks;
     runningTask = runningTask->next;
     while (runningTask->state != READY && runningTask->state != RUNNING) {
         runningTask = runningTask->next;
     }
     if (runningTask->state == RUNNING) return; // task already current
+    runningTask->current_quantum = runningTask->quantum;
     last->state = READY;
     runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);
@@ -104,11 +111,14 @@ void yield() {
 
 void schedule() {
     Task *last = runningTask;
+    last->time_used += timer_ticks - start_time;
+    start_time = timer_ticks;
     runningTask = runningTask->next;
     while (runningTask->state != READY && runningTask->state != RUNNING) {
         runningTask = runningTask->next;
     }
     if (runningTask->state == RUNNING) return; // task already current
+    runningTask->current_quantum = runningTask->quantum;
     last->state = READY;
     runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);

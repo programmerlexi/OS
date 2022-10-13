@@ -31,7 +31,7 @@ void beep(uint32_t hz, int length) {
 }
 
 void beep(uint32_t hz) {
-	beep(hz,10);
+	beep(hz,100);
 }
 
 //Make a beep
