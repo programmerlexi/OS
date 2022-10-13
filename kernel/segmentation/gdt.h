@@ -4,7 +4,7 @@
 
 #define GDT_CODE_SEGMENT 0x08
 #define GDT_DATA_SEGMENT 0x10
-#define GDT_STACK_SEGMENT 0x18
+#define GDT_STACK_SEGMENT 0x10
 
 typedef struct
 {
@@ -34,7 +34,8 @@ typedef enum
     GDT_ACCESS_DATA_SEGMENT                 = 0x10,
     GDT_ACCESS_CODE_SEGMENT                 = 0x18,
 
-    GDT_ACCESS_DESCRIPTOR_TSS               = 0x00,
+    GDT_ACCESS_DESCRIPTOR_LDT               = 0x00,
+    GDT_ACCESS_DESCRIPTOR_TSS               = 0x01,
 
     GDT_ACCESS_RING0                        = 0x00,
     GDT_ACCESS_RING1                        = 0x20,

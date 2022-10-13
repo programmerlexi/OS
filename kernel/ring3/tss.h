@@ -29,9 +29,9 @@ struct tss_entry_struct {
 	uint32_t ldt;
 	uint16_t trap;
 	uint16_t iomap_base;
-} __attribute__((packed));
+} __packed;
  
 typedef struct tss_entry_struct tss_entry_t;
 
 void set_kernel_stack(uint32_t stack);
-extern void flush_tss(void);
+extern "C" void flush_tss(void);

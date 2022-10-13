@@ -96,6 +96,9 @@ void panic_dump_regs(int idx, regs_t* r) {
 
 	panic_print("EIP:", idx+724);
 	panic_print(HexToString(r->eip), idx+728);
+
+    panic_print("ERROR CODE: ", idx+804);
+    panic_print(HexToString(r->err_code), idx+815);
 }
 
 void panic_color(char color, int idx) {

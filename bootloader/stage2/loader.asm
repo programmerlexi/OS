@@ -354,7 +354,7 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0xf0000 ; maximum stack size
+	mov ebp, 0x7c00 ; maximum stack size
 	mov esp, ebp
     
     [extern boot_bits32]
