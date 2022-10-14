@@ -37,7 +37,7 @@ void build_program(void (*func)(), const char* name, const char* description) {
 
 void load_programs() {
     program_count = 0;
-    programs = (program_info*)malloc(sizeof(program_info) * 10);
+    programs = (program_info*)malloc(sizeof(program_info) * 15);
     build_program(clear,"clear","clears the screen");
     build_program(test,"test","tests the kernel");
     build_program(cpu_info,"cpuinfo","prints CPU information");
@@ -60,7 +60,6 @@ void terminal_init() {
     clear_screen();
     set_cursor_pos(0);
     print_string("Welcome to the kernel shell!\n\r");
-    programs = (program_info*)malloc(sizeof(program_info) * 10);
     load_programs();
     if (strcmp(USER,"kernel")) {
         print_string("You are logged in as the kernel. This is not recommended, please login!\n\r");
@@ -157,10 +156,9 @@ void terminal_loop() {
                 return;
             } else if (strlen(input) > 0) {
                 bool found = false;
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < program_count; i++) {
                     if (strcmp(input, programs[i].name)) {
                         enter_debug_scope((char*)"program creation");
-                        proc_wait();
                         found = true;
                         started = true;
                         sub_pid = fork(programs[i].func);

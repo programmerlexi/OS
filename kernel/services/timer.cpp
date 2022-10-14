@@ -17,7 +17,7 @@ void timer_handler(struct regs *r)
     timer_ticks++;
     swap_buffers();
     end_interrupt(r);
-    asm("sti");
+    asm("sti"); // End the interrupt
     if (tasking) {
         runningTask->current_quantum--;
         if (runningTask->current_quantum < 0) {

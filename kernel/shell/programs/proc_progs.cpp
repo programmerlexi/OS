@@ -1,25 +1,31 @@
 #include "../../services/proc.h"
 #include "../../gatr/vga.h"
+
+void fbomb();
+
 void procs() {
     clear_screen();
     disable_cursor();
     while (1) {
         set_cursor_pos(0);
+        print_string("I P State    Run Time\n\r");
         Task* task = &mainTask;
         print_string(num_to_char(task->tid));
         print_string(" ");
+        print_string(num_to_char(task->ptid));
+        print_string(" ");
         switch (task->state) {
             case 0:
-                print_string("RUNNING");
+                print_string("RUNNING ");
                 break;
             case 1:
-                print_string("READY");
+                print_string("READY   ");
                 break;
             case 2:
                 print_string("SLEEPING");
                 break;
             default:
-                print_string("Unknown");
+                print_string("Unknown ");
         }
         print_string(" ");
         print_int(task->time_used);
@@ -28,18 +34,20 @@ void procs() {
         while (task != &mainTask) {
             print_string(num_to_char(task->tid));
             print_string(" ");
+            print_string(num_to_char(task->ptid));
+            print_string(" ");
             switch (task->state) {
                 case 0:
-                    print_string("RUNNING");
+                    print_string("RUNNING ");
                     break;
                 case 1:
-                    print_string("READY");
+                    print_string("READY   ");
                     break;
                 case 2:
                     print_string("SLEEPING");
                     break;
                 default:
-                    print_string("Unknown");
+                    print_string("Unknown ");
             }
             print_string(" ");
             print_int(task->time_used);

@@ -26,7 +26,7 @@ stage2:
 [global load_kernel_from_disk]
 load_kernel_from_disk:
     mov bx, KERNEL_LOCATION
-    mov dh, 98
+    mov dh, 100
 
     mov ah, 0x02
     mov al, dh 

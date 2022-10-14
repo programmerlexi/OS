@@ -312,13 +312,8 @@ void kernel_init() {
     } else {
         switch_to_text_mode();
     }
-    if (check_pge()) {
-        print_string("[OK] Paging Enabled\n\r");
-    }
+    print_string("[OK] Paging Enabled\n\r");
     verify_kernel();
-    print_string("Initializing processes!\r");
-    proc_init(); // Initialize processses
-    print_string("[OK] Processes initialized!\n\r");
     print_string("Creating Filesystem\n\r");
     init_fs();
     asm volatile("cli"); // Disable interrupts
@@ -400,6 +395,8 @@ void kernel_main() {
     exit_debug_scope();
 }
 
+extern "C" void test_syscalls();
+
 extern "C" void main(){
     kernel_init(); // Initialize the kernel
 
@@ -407,7 +404,9 @@ extern "C" void main(){
 
     kernel_main(); // Run the kernel
 
-    mainTask.state = 2;
+    test_syscalls();
+
+    yield(WAITING);
     while (true) {
         asm("hlt"); // Only do stuff when an interrupt occurs.
     }

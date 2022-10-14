@@ -6,9 +6,10 @@
 #include "../memory/heap.h"
 
 void fork(Task* task, void(*func)()) {
-    createTask(task,func,runningTask->regs.eflags,(uint32_t*)mainTask.regs.cr3);
+    createTask(task,func,runningTask->regs.eflags,(uint32_t*)runningTask->regs.cr3);
     task->next = runningTask->next;
     runningTask->next = task;
+    task->ptid = runningTask->tid;
 }
 
 Task* fork(void(*func)()) {
@@ -31,6 +32,12 @@ void quit() {
     yield();
 }
 
+void idle() {
+    while (1) {
+        asm("nop");
+    }
+}
+
 void initTasking() {
     enter_debug_scope((char*)"init_tasking");
     // Get EFLAGS and CR3
@@ -42,6 +49,10 @@ void initTasking() {
     mainTask.quantum = 20; // Kernel get extra quantum
     mainTask.current_quantum = 20; 
     runningTask = &mainTask;
+
+    Task* idle_task = fork(idle);
+    idle_task->quantum = 2; // Idle gets 2 ms quantum
+
     exit_debug_scope();
 }
 
@@ -95,6 +106,10 @@ void unlock_scheduler() {
 
 uint64_t start_time = 0;
 void yield() {
+    yield(READY);
+}
+
+void yield(TaskState ts) {
     Task *last = runningTask;
     last->time_used += timer_ticks - start_time;
     start_time = timer_ticks;
@@ -104,7 +119,7 @@ void yield() {
     }
     if (runningTask->state == RUNNING) return; // task already current
     runningTask->current_quantum = runningTask->quantum;
-    last->state = READY;
+    last->state = ts;
     runningTask->state = RUNNING;
     switchTask(&last->regs, &runningTask->regs);
 }

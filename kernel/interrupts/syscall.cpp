@@ -14,15 +14,14 @@ void down(regs_t* r) {
     power_shutdown();
 }
 void fork(regs_t* r) {
-    disregard_regs(r);
-    proc_fork(proc_list[cur_pid].loop, proc_list[cur_pid].name);
+    fork((void(*)())r->ebx);
 }
 void exec(regs_t* r) {
-    proc_quit(0);
-    proc_create((void*)r->eax, (char*)r->ebx);
+    fork((void(*)())r->ebx);
+    quit();
 }
 void exit(regs_t* r) {
-    proc_quit(r->eax);
+    quit();
 }
 void time(regs_t* r) {
     read_rtc();

@@ -21,6 +21,7 @@ typedef struct Task {
     bool running;
     TaskState state;
     uint64_t tid;
+    uint64_t ptid;
     uint64_t time_used;
     uint8_t quantum;
     char current_quantum;
@@ -40,6 +41,7 @@ void lock_scheduler();
 void unlock_scheduler();
 
 extern void yield(); // Switch task frontend
+extern void yield(TaskState);
 extern "C" void switchTask(Registers*, Registers*); // The function which actually switches
 extern void schedule();
 
