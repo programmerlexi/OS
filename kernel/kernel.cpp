@@ -387,8 +387,6 @@ void kernel_main() {
     print_string("Slave Drive Ready: ");
     print_string(slave_rdy ? "Yes\n\r" : "No\n\r");
     fork(terminal_init);
-    //terminal_init(); // Initialize the terminal
-    //proc_create((void*)terminal_loop,"terminal"); // Create a process to run the terminal
     
     exit_debug_scope();
 }
@@ -405,10 +403,9 @@ extern "C" void main(){
     test_syscalls();
 
     yield(WAITING);
-    while (true) {
+    while (true) { // We should not reach this
         asm("hlt"); // Only do stuff when an interrupt occurs.
     }
-
     return;
 }
 #include "klib.cpp"

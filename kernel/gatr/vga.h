@@ -364,6 +364,7 @@ namespace vga_graphics {
     void switch_to_graphics_mode();
     void clear_screen();
     void scroll_down(int value);
+	void swap();
     void putpixel(uint32_t x, uint32_t y, uint32_t color);
     void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
     void set_mode(uint64_t idx);

@@ -276,7 +276,11 @@ void set_mode(uint64_t idx) {
             break;
     }
     load_graphics_registers();
-    graphics_buffer = (uint8_t*)(get_fb_seg()*16);
+	if (graphics_buffer == NULL) {
+		free(graphics_buffer);
+	}
+    graphics_buffer = (uint8_t*)malloc(driver.width*driver.height);//(get_fb_seg()*16);
+	graphics_buffer_back = (uint8_t*)(get_fb_seg()*16);
     clear_screen();
 }
 
@@ -285,6 +289,10 @@ void scroll_down(int value) {
 		set_plane(p);
 		memcpy(graphics_buffer,graphics_buffer+(value*driver.width),(driver.width*driver.height)-(value*driver.width));
 	}
+}
+
+void swap() {
+	memcpy(graphics_buffer_back,graphics_buffer,driver.width*driver.height);
 }
 
 void init_graphics() {

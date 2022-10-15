@@ -4,6 +4,7 @@
 #include "shell/env.cpp"
 #include "shell/programs/proc_progs.cpp"
 #include "shell/programs/time_and_date.cpp"
+#include "shell/programs/games/pong.cpp"
 
 void terminal_loop();
 
@@ -48,6 +49,7 @@ void load_programs() {
     build_program(memory,"memory","prints the used heap memory");
     build_program(read_sector_one, "sector", "prints the first sector");
     build_program(reboot,"reboot","reboot the system");
+    build_program(pong,"pong","pong");
 }
 
 Task* sub_pid;

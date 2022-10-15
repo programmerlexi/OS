@@ -10,7 +10,7 @@ main:
     mov ds, ax
     mov bp, 0x7c00 ; Does the stack work with out a base address? YES IT DOES!
     mov sp, bp
-    
+
     ;clear the screen
 	mov ah, 0x00
 	mov al, 0x2
