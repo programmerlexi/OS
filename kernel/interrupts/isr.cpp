@@ -61,44 +61,75 @@ void isrs_install()
 
 const char* exception_messages[] = 
 {
-	"Division By Zero Exception.",
-	"Debug Exception.",
-	"Non Maskable Interrupt Exception.",
-	"Breakpoint Exception.",
-	"Into Detected Overflow Exception.",
-	"Out of Bounds Exception.",
-	"Invalid Opcode Exception.",
-	"No Coprocessor Exception.",
-	"Double Fault Exception.",
-	"Coprocessor Segment Overrun Exception.",
-	"Bad TSS Exception.",
-	"Segment Not Present Exception.",
-	"Stack Fault Exception.",
-	"General Protection Fault Exception.",
-	"Page Fault Exception.",
-	"Unknown Interrupt Exception.",
-	"Coprocessor Fault Exception.",
-	"Alignment Check Exception.",
-	"Machine Check Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception.",
-	"Reserved Exception."
+	"Division By Zero",
+	"Debug",
+	"Non Maskable Interrupt",
+	"Breakpoint",
+	"Into Detected Overflow",
+	"Out of Bounds",
+	"Invalid Opcode",
+	"No Coprocessor",
+	"Double Fault",
+	"Coprocessor Segment Overrun",
+	"Bad TSS",
+	"Segment Not Present",
+	"Stack Fault",
+	"General Protection Fault",
+	"Page Fault",
+	"Unknown Interrupt",
+	"Coprocessor Fault",
+	"Alignment Check",
+	"Machine Check",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved"
 };
 
 extern "C" void _fault_handler(regs_t *r)
 {
     if (r->int_no < 32)
     {
-		if (handle_interrupts) kpanic(exception_messages[r->int_no],r);
+		if (handle_interrupts) {
+			if (tasking) {
+				if (runningTask->tid == 0) {
+					kpanic(exception_messages[r->int_no],r);
+				} else {
+					print_int(runningTask->tid);
+					print_string(": ");
+					switch (r->int_no) {
+						case 14:
+							if ((r->err_code >> 2) & 1) print_string("User process ");
+							else print_string("Supervisor process ");
+							print_int(runningTask->tid);
+							print_string(" tried to ");
+							if ((r->err_code >> 1) & 1) print_string("write to ");
+							else print_string("read from ");
+							if ((r->err_code >> 0) & 1) print_string("a present page");
+							else print_string("a non-present page");
+							if ((r->err_code >> 5) & 1) print_string(" and violated a protection-key");
+							if ((r->err_code >> 6) & 1) print_string(" during a shadow stack access");
+							if ((r->err_code >> 4) & 1) print_string(" during instruction-fetch");
+							print_string(".");
+							break;
+						default:
+							print_string(exception_messages[r->int_no]);
+					}
+					print_string("\n\r");
+					quit();
+				}
+			} else {
+				kpanic(exception_messages[r->int_no],r);
+			}
+		} 
  	}
 }
