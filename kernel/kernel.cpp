@@ -291,11 +291,9 @@ void verify_kernel();
 
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
-    init_paging(); // Initialize paging if its available
     init_gdt(); // Initialize the GDT
     init_heap(0x100000, 0x200000);
     memory_self_test(); // Run memory self-test.
-    //init_sysmem(0x100000-sizeof(sysmem_t), 0x200000); // Initialize the system memory
     init_vga(); // Initialize VGA
     vga_graphics::init_graphics();
     if (get_boot_info()->splash_screen) {
@@ -312,10 +310,10 @@ void kernel_init() {
     } else {
         switch_to_text_mode();
     }
-    print_string("[OK] Paging Enabled\n\r");
     verify_kernel();
     print_string("Creating Filesystem\n\r");
     init_fs();
+
     asm volatile("cli"); // Disable interrupts
     print_string("Initializing interrupts!\r");
     idt_install(); // Create the IDT

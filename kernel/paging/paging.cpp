@@ -8,11 +8,14 @@ void idpaging(uint32_t *first_pte, int from, int size) {
 }
 void init_paging() {
     page_directory *dir = (page_directory*)current_page_directory;
+    
     if (!dir) kpanic("Out of memory", get_regs());
     memset(dir,0,sizeof(page_directory));
+    
     for (uint32_t i = 0; i < TABLES_PER_DIRECTORY; i++) {
         dir->entries[i] = 0x02;
     }
+
     page_table *table = (page_table*)paging_table;
     if (!table) kpanic("Out of memory", get_regs());
     memset(table,0,sizeof(page_table));
@@ -59,7 +62,23 @@ void init_paging() {
     SET_ATTRIBUTE(&entry3,PDE_PRESENT);
     SET_ATTRIBUTE(&entry3,PDE_READ_WRITE);
     SET_FRAME(&entry3,(paddr)table3);
-    dir->entries[3] = entry3;
+    dir->entries[2] = entry3;
+
+    page_table *table4 = (page_table*)paging_table4;
+    if (!table4) kpanic("Out of memory", get_regs());
+    memset(table4,0,sizeof(page_table));
+    for (uint32_t i = 0, frame = 0xC00000, virt = 0xC00000; i<PAGES_PER_TABLE; i++, frame+=PAGE_SIZE, virt += PAGE_SIZE) {
+        pte page = 0;
+        SET_ATTRIBUTE(&page,PTE_PRESENT);
+        SET_ATTRIBUTE(&page,PTE_READ_WRITE);
+        SET_FRAME(&page,frame);
+        table4->entries[PT_INDEX(virt)] = page;
+    }
+    pde entry4 = 0;
+    SET_ATTRIBUTE(&entry4,PDE_PRESENT);
+    SET_ATTRIBUTE(&entry4,PDE_READ_WRITE);
+    SET_FRAME(&entry4,(paddr)table4);
+    dir->entries[3] = entry4;
 
     set_page_directory(dir);
     enablePaging();

@@ -56,8 +56,6 @@ extern "C" void loader_c() {
     EnableSSE();
     print_string("Enabling A20 line...\n\r");
     enableA20();
-    print_string("Entering Unreal mode...\n\r");
-    enable_unreal();
     print_string("Loading Kernel from disk ...\n\r");
     load_kernel_from_disk();
     print_string("Loading GDT...\n\r");

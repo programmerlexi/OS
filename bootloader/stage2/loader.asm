@@ -1,5 +1,5 @@
 bits 16
-KERNEL_LOCATION equ 0x00007c00
+KERNEL_LOCATION equ 0x0000C000
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -25,7 +25,10 @@ stage2:
 
 [global load_kernel_from_disk]
 load_kernel_from_disk:
-    mov bx, KERNEL_LOCATION
+    push es
+    mov ax, 0xC00
+    mov es, ax
+    mov bx, 0
     mov dh, 100
 
     mov ah, 0x02
@@ -36,11 +39,13 @@ load_kernel_from_disk:
     mov dl, [0x5004]
     int 0x13
     jnc after_load
+    pop es
     mov ah, 0x0e
     mov bx, failed_disk
     call print_string
     jmp $
 after_load:
+    pop es
     mov ah, 0x0e
     mov bx, good
     call print_string

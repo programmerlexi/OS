@@ -46,7 +46,7 @@ void initTasking() {
     mainTask.tid = 0;
 
     mainTask.next = &mainTask;
-    mainTask.quantum = 20; // Kernel get extra quantum
+    mainTask.quantum = 20; // Kernel gets extra quantum
     mainTask.current_quantum = 20; 
     runningTask = &mainTask;
 
@@ -64,7 +64,7 @@ void process_end() {
 uint64_t prev_stack = 0x300000;
 void* allocateStack() {
     enter_debug_scope((char*)"stack allocation");
-    prev_stack = prev_stack + 0x2000;
+    prev_stack = prev_stack + 0x1000;
     *(uint32_t*)(prev_stack - 4) = (uint32_t)&process_end;
     return (void*)prev_stack;
 }
@@ -79,7 +79,7 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.eflags = flags;
     task->regs.eip = (uint32_t) main;
     task->regs.cr3 = (uint32_t) pagedir;
-    task->regs.esp = (uint32_t) allocateStack()-4; // Not implemented here
+    task->regs.esp = (uint32_t) allocateStack()-4;
     task->regs.ebp = task->regs.esp+4;
     task->next = 0;
     task->running = true;

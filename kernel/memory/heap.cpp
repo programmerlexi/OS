@@ -3,7 +3,10 @@
 
 //heap_segment_header* first_free_segment;
 
+uint64_t heap_limit = 0;
+
 void init_heap(uint64_t heapAddress, size_t size) {
+    heap_limit = heapAddress + size;
     first_free_segment = (heap_segment_header*)heapAddress;
     first_free_segment->size = size;
     first_free_segment->next = NULL;
@@ -38,6 +41,9 @@ heap_segment_header* get_new_segment(heap_segment_header* ptr, uint64_t offset,s
     segment->free = true;
     ptr->next->prev = segment;
     ptr->next = segment;
+    if (((uint64_t)segment) > heap_limit) {
+        kpanic("Heap exceeds limit!", get_regs());
+    }
     return segment;
 }
 
