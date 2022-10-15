@@ -4,7 +4,7 @@ stage2:
     xor ax, ax                          
     mov es, ax
     mov ds, ax
-    mov bp, 0x1000 ; Does the stack work with out a base address? YES IT DOES!
+    mov bp, 0x1000
     mov sp, bp
 
     mov ah, 0x0e
@@ -19,6 +19,21 @@ stage2:
 
     mov bx, finished_memory
     call print_string
+
+    mov ax, 0xEC00
+    mov bx, 1
+    int 0x15 ; Optimize for Protected Mode
+
+    mov eax, cr4
+    and eax, ~0b100 ; Enable the TSC
+    or eax, 0b100000 ; Enable Physical Address Extension
+    mov cr4, eax
+
+    pushf
+    pop eax
+    or eax, 0b1000000000000000000000 ; Enable the CPUID instruction
+    push eax
+    popf
 
     [extern loader_c]
     call loader_c

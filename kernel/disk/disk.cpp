@@ -3,7 +3,7 @@
 bool identify_ata(uint8_t drive) {
     // 0xA0 for Master
 	// 0xB0 for Slave
-
+    if (inb(0x1F7) == 0xFF) return false;
 	outb(0x1F6, drive);
 	outb(0x1F2, 0);
 	outb(0x1F3, 0);
