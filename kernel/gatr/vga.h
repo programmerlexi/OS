@@ -344,6 +344,8 @@ char color(char bg, char fg);
 unsigned int index(unsigned int char_index);
 void print_char(char c);
 void print_string(const char *str);
+void print_string(char *str, int len);
+void print_string(const char *str, int len);
 void print_string_no_white_spaces(const char *str);
 template<typename T>
 const char* HexToString(T value);

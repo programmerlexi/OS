@@ -1,5 +1,5 @@
 bits 16
-KERNEL_LOCATION equ 0x0000C000
+KERNEL_LOCATION equ 0x00005800
 stage2:
     xor ax, ax                          
     mov es, ax
@@ -26,14 +26,8 @@ stage2:
 
     mov eax, cr4
     and eax, ~0b100 ; Enable the TSC
-    or eax, 0b100000 ; Enable Physical Address Extension
+    ;or eax, 0b100000 ; Enable Physical Address Extension
     mov cr4, eax
-
-    pushf
-    pop eax
-    or eax, 0b1000000000000000000000 ; Enable the CPUID instruction
-    push eax
-    popf
 
     [extern loader_c]
     call loader_c
@@ -41,10 +35,10 @@ stage2:
 [global load_kernel_from_disk]
 load_kernel_from_disk:
     push es
-    mov ax, 0xC00
+    mov ax, 0x580
     mov es, ax
     mov bx, 0
-    mov dh, 100
+    mov dh, 102
 
     mov ah, 0x02
     mov al, dh 
@@ -374,7 +368,7 @@ start_protected_mode:
 	mov ss, ax
     
     ; set up the stack
-	mov ebp, 0x7c00 ; maximum stack size
+	mov ebp, 0x5800 ; maximum stack size
 	mov esp, ebp
     
     [extern boot_bits32]

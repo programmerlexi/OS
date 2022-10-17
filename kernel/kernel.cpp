@@ -292,7 +292,7 @@ void verify_kernel();
 void kernel_init() {
     enter_debug_scope((char*)"kernel_init");
     init_gdt(); // Initialize the GDT
-    init_heap(0x100000, 0x200000);
+    init_heap(0x100000, 0x300000);
     memory_self_test(); // Run memory self-test.
     init_vga(); // Initialize VGA
     vga_graphics::init_graphics();
@@ -386,8 +386,10 @@ void kernel_main() {
     print_string(master_rdy ? "Yes\n\r" : "No\n\r");
     print_string("Slave Drive Ready: ");
     print_string(slave_rdy ? "Yes\n\r" : "No\n\r");
+    shmcreat(1234,18);
+    char* c = (char*)shmget(1234);
+    strcpy(c,"Shared memory test",18);
     fork(terminal_init);
-    
     exit_debug_scope();
 }
 

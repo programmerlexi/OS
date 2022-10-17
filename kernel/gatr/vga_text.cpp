@@ -343,6 +343,10 @@ void print_string(const char *str, int len) {
     }
 }
 
+void print_string(char* str, int len) {
+	print_string((const char*)str,len);
+}
+
 void print_string_no_whitespaces(const char *str)
 {
     uint8_t* charPtr = (uint8_t*)str;

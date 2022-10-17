@@ -62,6 +62,9 @@ void terminal_init() {
     clear_screen();
     set_cursor_pos(0);
     print_string("Welcome to the kernel shell!\n\r");
+    print_string((char*)shmget(1234),18);
+    print_string("\n\r");
+    //shmdel(1234);
     load_programs();
     if (strcmp(USER,"kernel")) {
         print_string("You are logged in as the kernel. This is not recommended, please login!\n\r");
