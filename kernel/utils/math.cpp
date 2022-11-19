@@ -67,12 +67,19 @@ float fract(float x) {
     return x - floor(x);
 }
 
-float sqrt(float x) {
-    float t = 0;
-    float sqrt = x/2;
-    while (t != sqrt) {
-        t = sqrt;
-        sqrt = (x/t + t) / 2;
+int pow(int x, int i) {
+    int r = x;
+    for (int t = 1; t < i; t++) {
+        r = r*x;
     }
-    return sqrt;
+    return r;
+}
+
+int sqrt(int x) {
+    long r = 0;
+    while (pow(r,2) <= x) {
+        r++;
+    }
+    r--;
+    return (int)r;
 }

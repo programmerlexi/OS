@@ -140,10 +140,12 @@ bool map_page(void *physicaladdr, void *virtualaddr) {
     pte *page = &table->entries[PT_INDEX((uint32_t)virtualaddr)];
     SET_FRAME(page,(paddr)physicaladdr);
     SET_ATTRIBUTE(page,PTE_PRESENT);
+    return true;
 }
 
 bool unmap_page(void* virtualaddr) {
     pte *page = get_page((uint32_t)virtualaddr);
     SET_FRAME(page,0);
     CLEAR_ATTRIBUTE(page,PTE_PRESENT);
+    return true;
 }

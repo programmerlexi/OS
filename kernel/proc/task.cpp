@@ -108,7 +108,7 @@ void initTasking() {
     Task* idle_task = fork(idle);
     idle_task->quantum = 2; // Idle gets 2 ms quantum
 
-    shared_mem.key = 0x1337;
+    shared_mem.key = 0x1337c0de;
 
     exit_debug_scope();
 }
@@ -138,7 +138,7 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->regs.cr3 = (uint32_t) pagedir;
     task->regs.esp = (uint32_t) allocateStack()-4;
     task->regs.ebp = task->regs.esp+4;
-    task->next = 0;
+    task->next = (Task*)0;
     task->running = true;
     task->time_used = 0;
     task->state = READY;

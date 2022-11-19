@@ -16,4 +16,5 @@ int round(float x);
 float floor(float x);
 float ceil(float x);
 float fract(float x);
-float sqrt(float x);
+int pow(int x, int i);
+int sqrt(int x);

@@ -86,7 +86,7 @@ void outl(uint16_t port, uint32_t data)
   asm volatile("outl %0, %1" : : "a"(data), "Nd"(port));
 }
 
-char* num_to_char(uint8_t num) {
+char* num_to_char(uint32_t num) {
   char* c = 0;
   itoa(num, c);
   return c;

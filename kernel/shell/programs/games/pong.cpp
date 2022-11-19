@@ -19,7 +19,7 @@ void init_game() {
 }
 
 void pong() {
-    vga_graphics::set_mode(0);
+    vga_graphics::set_mode(1);
     while (kpressed[0x1c]) asm("nop");
     while (true) {
         clear_screen();
@@ -59,7 +59,7 @@ void pong() {
             vga_graphics::draw_rect(1,pads_y,5,40,WHITE);
             vga_graphics::draw_rect(314,pads_y,5,40,WHITE);
             vga_graphics::swap();
-            sleep(50); // 20 FPS max
+            sleep(1);
         }
         print_bitmap_string("GAME OVER", 160-36,10,LIGHT_RED);
         print_bitmap_string("Score: ", 160-56,40,WHITE);

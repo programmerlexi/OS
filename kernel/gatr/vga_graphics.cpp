@@ -175,10 +175,11 @@ void clear_screen() {
     if (driver.direct) {
         memset(graphics_buffer,0,driver.width*driver.height);
     } else {
-        for (int i = 0; i < 4; i++) {
+        /*for (int i = 0; i < 4; i++) {
             set_plane(i);
 			memset(graphics_buffer,0,driver.height*wd_in_bytes);
-        }
+        }*/
+		draw_rect(0,0,driver.width,driver.height,0);
     }
 }
 
@@ -204,7 +205,7 @@ void g_640x480x16_putpixel(uint32_t x, uint32_t y, uint32_t color) {
 	pmask = 1;
 	for(p = 0; p < 4; p++)
 	{
-		set_plane(p);
+		//set_plane(p);
 		if(pmask & c)
 			graphics_buffer[off] |= mask;
 		else
@@ -225,7 +226,7 @@ void draw_rect(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t
         uint32_t off;
         uint16_t pmask = 1;
 	    for (int i = 0; i < 4; i++) {
-            set_plane(i);
+            //set_plane(i);
             for (uint64_t j = 0; j < height; j++) {
                 for (uint64_t k = 0; k < width; k++) {
                     uint32_t mask = 0x80 >> ((x+k)&7);
@@ -292,7 +293,10 @@ void scroll_down(int value) {
 }
 
 void swap() {
-	memcpy(graphics_buffer_back,graphics_buffer,driver.width*driver.height);
+	for (int i=0; i<4; i++) {
+		set_plane(i);
+		memcpy(graphics_buffer_back,graphics_buffer,driver.width*driver.height);
+	}
 }
 
 void init_graphics() {

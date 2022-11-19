@@ -389,6 +389,18 @@ void kernel_main() {
     shmcreat(1234,18);
     char* c = (char*)shmget(1234);
     strcpy(c,"Shared memory test",18);
+    int i0 = sqrt(1);
+    int i1 = sqrt(4);
+    int i2 = sqrt(9);
+    int i3 = sqrt(144);
+    print_string(num_to_char(i0));
+    print_string("\n\r");
+    print_string(num_to_char(i1));
+    print_string("\n\r");
+    print_string(num_to_char(i2));
+    print_string("\n\r");
+    print_string(num_to_char(i3));
+    print_string("\n\r");
     fork(terminal_init);
     exit_debug_scope();
 }

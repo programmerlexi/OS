@@ -42,3 +42,7 @@ void print_bitmap_string(char* str,uint64_t x, uint64_t y, uint32_t color) {
         str += 1;
     }
 }
+
+void print_bitmap_string(const char* str, uint64_t x, uint64_t y, uint32_t color) {
+    print_bitmap_string((char*)str,x,y,color);
+}
