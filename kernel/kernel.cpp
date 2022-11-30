@@ -403,6 +403,8 @@ void kernel_main() {
     print_string(num_to_char(i3));
     print_string("\n\r");
     fork(terminal_init);
+    /*enter_debug_scope("umode");
+    jump_usermode();*/
     exit_debug_scope();
 }
 
