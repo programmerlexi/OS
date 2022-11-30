@@ -27,4 +27,4 @@ test_syscalls:
 %include "kernel/asm/paging.asm"
 %include "kernel/asm/task.asm"
 %include "kernel/ring3/tss.asm"
-%include "kernel/ring3/umode.asm"
+%include "kernel/asm/umode.asm"

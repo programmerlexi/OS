@@ -207,7 +207,8 @@ void test_proc() {
 }
 
 extern "C" {
-    void test_user_function() {
+    void enter_umode() {
+        print_string("Hi!\n\r");
         for (;;);
     }
 }

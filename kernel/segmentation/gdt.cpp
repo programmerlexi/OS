@@ -36,4 +36,5 @@ void init_gdt()
                 GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_1B); // Ring 3 data segment
     write_tss(&g_GDT[5]);
     load_gdt(&g_GDTDescriptor, GDT_CODE_SEGMENT, GDT_DATA_SEGMENT);
+    flush_tss();
 }

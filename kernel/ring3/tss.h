@@ -33,5 +33,5 @@ struct tss_entry_struct {
  
 typedef struct tss_entry_struct tss_entry_t;
 
-void set_kernel_stack(uint32_t stack);
+extern "C" void set_kernel_stack(uint32_t stack);
 extern "C" void flush_tss(void);
